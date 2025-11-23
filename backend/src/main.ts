@@ -37,13 +37,26 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
       origin: (origin, callback) => {
+        // En production, accepter le frontend Vercel
+        const frontendUrl = process.env.FRONTEND_URL;
+        const allowedOrigins = frontendUrl ? [frontendUrl] : [];
+        
         // En développement, accepter toutes les origines locales et réseau local
-        if (!origin || 
+        const isDevelopment = process.env.NODE_ENV !== 'production';
+        const isLocalOrigin = !origin || 
             origin.includes('localhost') || 
             origin.includes('127.0.0.1') || 
             origin.match(/^http:\/\/192\.168\.\d+\.\d+:\d+$/) ||
             origin.match(/^http:\/\/10\.\d+\.\d+\.\d+:\d+$/) ||
-            origin.match(/^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/)) {
+            origin.match(/^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/);
+        
+        // Accepter les origines autorisées ou locales en développement
+        if (isDevelopment && isLocalOrigin) {
+          callback(null, true);
+        } else if (origin && allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else if (!origin && isDevelopment) {
+          // Permettre les requêtes sans origin en développement (Postman, etc.)
           callback(null, true);
         } else {
           callback(new Error('Not allowed by CORS'));

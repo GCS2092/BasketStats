@@ -25,6 +25,7 @@ import { PaytechModule } from './paytech/paytech.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { FriendsModule } from './friends/friends.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { FriendsModule } from './friends/friends.module';
     SubscriptionModule,
     OnboardingModule,
     FriendsModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
