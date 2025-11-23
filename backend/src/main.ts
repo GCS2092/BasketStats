@@ -96,10 +96,11 @@ async function bootstrap() {
   // Préfixe global pour l'API
   app.setGlobalPrefix('api');
 
+  // Railway et autres plateformes cloud définissent automatiquement PORT
   const port = process.env.PORT || 3001;
   const networkIP = getLocalNetworkIP();
   
-  await app.listen(port, '0.0.0.0'); // ← ÉCOUTER SUR TOUTES LES INTERFACES
+  await app.listen(port, '0.0.0.0'); // ← ÉCOUTER SUR TOUTES LES INTERFACES (nécessaire pour Railway)
 
   console.log(`\n🚀 Backend NestJS démarré sur :`);
   console.log(`   Local:   http://localhost:${port}`);
