@@ -152,7 +152,7 @@ export default function SubscriptionHistory({ className = '' }: SubscriptionHist
           <h2 className="text-xl font-semibold text-neutral-800">Historique des Abonnements</h2>
         </div>
         <p className="text-neutral-600 mt-2">
-          Consultez l'historique de vos abonnements et demandez une restauration si nécessaire.
+          Consultez l&apos;historique de vos abonnements et demandez une restauration si nécessaire.
         </p>
       </div>
 
@@ -162,7 +162,7 @@ export default function SubscriptionHistory({ className = '' }: SubscriptionHist
           <div className="text-center py-12">
             <ClockIcon className="mx-auto h-12 w-12 text-neutral-300 mb-4" />
             <h3 className="text-lg font-semibold text-neutral-800 mb-2">Aucun historique</h3>
-            <p className="text-neutral-600">Vous n'avez pas encore d'abonnements.</p>
+            <p className="text-neutral-600">Vous n&apos;avez pas encore d&apos;abonnements.</p>
           </div>
         ) : (
           <div className="space-y-4">

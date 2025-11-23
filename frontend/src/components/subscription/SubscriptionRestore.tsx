@@ -209,7 +209,7 @@ export default function SubscriptionRestore({ className = '' }: SubscriptionRest
                 {/* Modal de restauration */}
                 {selectedSubscription === subscription.id && (
                   <div className="mt-4 p-4 bg-white border border-neutral-200 rounded-lg">
-                    <h4 className="font-medium text-neutral-800 mb-3">Restauration de l'abonnement</h4>
+                    <h4 className="font-medium text-neutral-800 mb-3">Restauration de l&apos;abonnement</h4>
                     <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-1">
