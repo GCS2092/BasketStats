@@ -15,13 +15,7 @@ export default function MyPlayersPage() {
 
   const isRecruiter = session?.user?.role === 'RECRUITER';
 
-  // Rediriger si pas recruteur
-  if (session && !isRecruiter) {
-    router.push('/feed');
-    return null;
-  }
-
-  // Récupérer les joueurs qui ont accepté mes offres
+  // Récupérer les joueurs qui ont accepté mes offres (doit être appelé avant tout return)
   const { data, isLoading } = useQuery({
     queryKey: ['my-players'],
     queryFn: async () => {
@@ -30,6 +24,12 @@ export default function MyPlayersPage() {
     },
     enabled: !!session && isRecruiter,
   });
+
+  // Rediriger si pas recruteur
+  if (session && !isRecruiter) {
+    router.push('/feed');
+    return null;
+  }
 
   if (isLoading) {
     return (
@@ -144,7 +144,7 @@ export default function MyPlayersPage() {
             <div className="card p-12 text-center">
               <div className="text-6xl mb-4">⭐</div>
               <p className="text-neutral-500 text-lg mb-2">
-                Aucun joueur n'a encore accepté vos offres
+                Aucun joueur n&apos;a encore accepté vos offres
               </p>
               <p className="text-neutral-400 text-sm mb-6">
                 Recherchez des talents et envoyez-leur des offres de recrutement

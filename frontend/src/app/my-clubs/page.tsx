@@ -244,7 +244,7 @@ function MyClubsPageContent() {
         ) : (
           <div className="text-center py-12">
             <div className="text-6xl mb-6">🏢</div>
-            <h2 className="text-2xl font-bold text-neutral-800 mb-4">Vous n'êtes membre d'aucun club</h2>
+            <h2 className="text-2xl font-bold text-neutral-800 mb-4">Vous n&apos;êtes membre d&apos;aucun club</h2>
             <p className="text-neutral-600 mb-8 max-w-md mx-auto">
               Rejoignez des clubs de basketball pour connecter avec d'autres joueurs, 
               coachs et passionnés du sport.

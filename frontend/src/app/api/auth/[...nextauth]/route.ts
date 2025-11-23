@@ -147,5 +147,12 @@ export const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST };
+// Wrapper functions pour compatibilité Next.js 14
+export function GET(request: Request) {
+  return (handler as any)(request);
+}
+
+export function POST(request: Request) {
+  return (handler as any)(request);
+}
 

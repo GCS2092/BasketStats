@@ -307,7 +307,7 @@ function AdminClubsContent() {
                 <div>
                   <h3 className="font-semibold text-red-800 mb-2">Erreur de chargement</h3>
                   <p className="text-sm text-red-700 mb-2">
-                    Impossible de charger les clubs depuis l'API admin.
+                    Impossible de charger les clubs depuis l&apos;API admin.
                   </p>
                   <p className="text-sm text-red-700">
                     Le backend doit être redémarré pour que les nouvelles routes soient disponibles.

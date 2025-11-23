@@ -181,7 +181,7 @@ export default function PlayersListPage() {
                           {player.user.fullName}
                         </h3>
                         {player.nickname && (
-                          <p className="text-neutral-600 text-sm truncate">"{player.nickname}"</p>
+                          <p className="text-neutral-600 text-sm truncate">&quot;{player.nickname}&quot;</p>
                         )}
                         {player.currentClub && (
                           <p className="text-neutral-500 text-xs mt-1 truncate">

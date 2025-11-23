@@ -909,7 +909,7 @@ function AdminClubDetailContent() {
                       <p>• <strong>Contrats amateurs:</strong> Pas de salaire, participation aux frais</p>
                       <p>• <strong>Contrats de formation:</strong> Formation + petite rémunération</p>
                       <p>• <strong>Prêts:</strong> Joueur prêté à un autre club</p>
-                      <p>• <strong>Essais:</strong> Période d'essai avant signature</p>
+                      <p>• <strong>Essais:</strong> Période d&apos;essai avant signature</p>
                     </div>
                   </div>
                 </div>

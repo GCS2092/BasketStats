@@ -168,7 +168,7 @@ function ModerationAlertsContent() {
                 <ul className="text-sm text-blue-700 mt-2 space-y-1 ml-4">
                   <li>• Mots interdits et langage offensant</li>
                   <li>• Phrases suspectes et spam</li>
-                  <li>• Partage d'informations personnelles (email, téléphone)</li>
+                  <li>• Partage d&apos;informations personnelles (email, téléphone)</li>
                   <li>• Liens suspects</li>
                   <li>• Utilisateurs récidivistes</li>
                 </ul>
@@ -188,7 +188,7 @@ function ModerationAlertsContent() {
               </h3>
               <p className="text-neutral-600">
                 Le système de modération automatique surveille activement tous les contenus.
-                Les alertes apparaîtront ici dès qu'un contenu suspect sera détecté.
+                Les alertes apparaîtront ici dès qu&apos;un contenu suspect sera détecté.
               </p>
             </div>
           </div>

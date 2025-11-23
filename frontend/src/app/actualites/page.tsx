@@ -82,7 +82,7 @@ export default function ActualitesPage() {
                 <h4 className="font-medium mb-2">📰 Actualités</h4>
                 <ul className="space-y-1">
                   <li>• ESPN NBA News</li>
-                  <li>• L'Équipe Basket</li>
+                  <li>• L&apos;Équipe Basket</li>
                   <li>• Yahoo Sports NBA</li>
                   <li>• NBA.com</li>
                   <li>• CBS Sports NBA</li>

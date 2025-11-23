@@ -138,7 +138,7 @@ export default function AdminReportsPage() {
                   >
                     <option value="">Tous les statuts</option>
                     <option value="PENDING">En attente</option>
-                    <option value="INVESTIGATING">En cours d'investigation</option>
+                    <option value="INVESTIGATING">En cours d&apos;investigation</option>
                     <option value="RESOLVED">Résolu</option>
                   </select>
                 </div>
