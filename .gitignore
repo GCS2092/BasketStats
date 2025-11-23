@@ -95,3 +95,7 @@ public/workbox-*.js.map
 # Turborepo
 .turbo
 
+# OAuth secrets
+**/client_secret_*.json
+**/*client_secret*.json
+
