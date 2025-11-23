@@ -1,0 +1,265 @@
+/* Améliorations de responsivité pour mobile */
+
+/* Container responsive par défaut */
+.container-responsive {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Grilles responsives */
+.grid-responsive {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+}
+
+.grid-responsive-2 {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4;
+}
+
+.grid-responsive-4 {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4;
+}
+
+/* Flex responsif */
+.flex-responsive {
+  @apply flex flex-col sm:flex-row gap-3 sm:gap-4;
+}
+
+.flex-responsive-center {
+  @apply flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4;
+}
+
+.flex-responsive-start {
+  @apply flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4;
+}
+
+/* Textes responsifs */
+.text-responsive-xs {
+  @apply text-xs sm:text-sm;
+}
+
+.text-responsive-sm {
+  @apply text-sm sm:text-base;
+}
+
+.text-responsive-base {
+  @apply text-sm sm:text-base;
+}
+
+.text-responsive-lg {
+  @apply text-base sm:text-lg;
+}
+
+.text-responsive-xl {
+  @apply text-lg sm:text-xl;
+}
+
+.text-responsive-2xl {
+  @apply text-xl sm:text-2xl;
+}
+
+.text-responsive-3xl {
+  @apply text-2xl sm:text-3xl;
+}
+
+.text-responsive-4xl {
+  @apply text-3xl sm:text-4xl;
+}
+
+/* Espacement responsif */
+.space-responsive-sm {
+  @apply space-y-2 sm:space-y-3;
+}
+
+.space-responsive-md {
+  @apply space-y-3 sm:space-y-4;
+}
+
+.space-responsive-lg {
+  @apply space-y-4 sm:space-y-6;
+}
+
+/* Padding responsif */
+.p-responsive-sm {
+  @apply p-3 sm:p-4;
+}
+
+.p-responsive-md {
+  @apply p-4 sm:p-6;
+}
+
+.p-responsive-lg {
+  @apply p-4 sm:p-6 md:p-8;
+}
+
+/* Margin responsif */
+.m-responsive-sm {
+  @apply m-3 sm:m-4;
+}
+
+.m-responsive-md {
+  @apply m-4 sm:m-6;
+}
+
+.m-responsive-lg {
+  @apply m-4 sm:m-6 md:m-8;
+}
+
+/* Boutons responsifs */
+.btn-responsive-sm {
+  @apply px-3 py-2 text-xs sm:text-sm;
+}
+
+.btn-responsive-md {
+  @apply px-4 py-2 text-sm sm:text-base;
+}
+
+.btn-responsive-lg {
+  @apply px-6 py-3 text-base sm:text-lg;
+}
+
+/* Cards responsives */
+.card-responsive {
+  @apply bg-white rounded-lg shadow-md p-4 sm:p-6;
+}
+
+.card-responsive-lg {
+  @apply bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8;
+}
+
+/* Headers responsifs */
+.header-responsive {
+  @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold;
+}
+
+.header-responsive-sm {
+  @apply text-lg sm:text-xl md:text-2xl font-bold;
+}
+
+/* Images responsives */
+.img-responsive {
+  @apply w-full h-auto object-cover;
+}
+
+.img-responsive-square {
+  @apply w-full aspect-square object-cover;
+}
+
+.img-responsive-circle {
+  @apply w-full aspect-square object-cover rounded-full;
+}
+
+/* Formulaires responsifs */
+.form-responsive {
+  @apply space-y-4 sm:space-y-6;
+}
+
+.input-responsive {
+  @apply w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent;
+}
+
+/* Navigation responsives */
+.nav-responsive {
+  @apply flex flex-col sm:flex-row gap-2 sm:gap-4;
+}
+
+.nav-responsive-center {
+  @apply flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4;
+}
+
+/* Modals responsives */
+.modal-responsive {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+}
+
+.modal-content-responsive {
+  @apply bg-white rounded-lg shadow-xl w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto;
+}
+
+/* Tables responsives */
+.table-responsive {
+  @apply w-full overflow-x-auto;
+}
+
+.table-responsive table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+/* Badges responsifs */
+.badge-responsive {
+  @apply px-2 py-1 text-xs sm:text-sm rounded-full font-medium;
+}
+
+.badge-responsive-sm {
+  @apply px-2 py-1 text-xs rounded-full font-medium;
+}
+
+.badge-responsive-md {
+  @apply px-3 py-1 text-sm rounded-full font-medium;
+}
+
+/* Alerts responsifs */
+.alert-responsive {
+  @apply p-3 sm:p-4 rounded-lg text-sm sm:text-base;
+}
+
+/* Loading states responsifs */
+.loading-responsive {
+  @apply flex items-center justify-center p-4 sm:p-8;
+}
+
+.loading-spinner-responsive {
+  @apply w-8 h-8 sm:w-12 sm:h-12 border-4 border-primary border-t-transparent rounded-full animate-spin;
+}
+
+/* Utilitaires pour les petits écrans */
+.mobile-only {
+  @apply block sm:hidden;
+}
+
+.desktop-only {
+  @apply hidden sm:block;
+}
+
+.tablet-only {
+  @apply hidden md:block sm:hidden;
+}
+
+/* Améliorations pour les très petits écrans */
+@media (max-width: 320px) {
+  .container-responsive {
+    @apply px-2;
+  }
+  
+  .text-responsive-xs {
+    @apply text-xs;
+  }
+  
+  .btn-responsive-sm {
+    @apply px-2 py-1 text-xs;
+  }
+}
+
+/* Améliorations pour les écrans moyens */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .grid-responsive {
+    @apply grid-cols-2;
+  }
+  
+  .grid-responsive-4 {
+    @apply grid-cols-2;
+  }
+}
+
+/* Améliorations pour les grands écrans */
+@media (min-width: 1280px) {
+  .container-responsive {
+    @apply max-w-7xl;
+  }
+  
+  .grid-responsive {
+    @apply grid-cols-4;
+  }
+  
+  .grid-responsive-4 {
+    @apply grid-cols-4;
+  }
+}

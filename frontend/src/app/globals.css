@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import des styles responsifs */
+@import '../styles/responsive.css';
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
+    /* Empêcher le zoom sur les inputs sur mobile */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply antialiased;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  }
+
+  /* Titres responsifs */
+  h1 {
+    @apply font-sans font-bold text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  h2 {
+    @apply font-sans font-bold text-xl md:text-2xl lg:text-3xl;
+  }
+
+  h3 {
+    @apply font-sans font-semibold text-lg md:text-xl lg:text-2xl;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply font-sans font-semibold text-base md:text-lg;
+  }
+
+  /* Améliorer les inputs sur mobile */
+  input, textarea, select {
+    font-size: 16px; /* Empêche le zoom sur iOS */
+  }
+
+  @media (min-width: 768px) {
+    input, textarea, select {
+      font-size: 14px;
+    }
+  }
+}
+
+@layer components {
+  /* Boutons responsifs */
+  .btn {
+    @apply inline-flex items-center justify-center px-3 py-2 md:px-4 md:py-2.5 rounded-lg font-medium text-sm md:text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 min-h-[44px] touch-manipulation;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-600 focus:ring-primary-500 active:bg-primary-700;
+  }
+
+  .btn-secondary {
+    @apply btn bg-neutral-200 text-neutral-700 hover:bg-neutral-300 focus:ring-neutral-400 active:bg-neutral-400;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent text-white hover:bg-accent-600 focus:ring-accent-500 active:bg-accent-700;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary-500 active:bg-primary-600 active:text-white;
+  }
+
+  .btn-ghost {
+    @apply btn text-neutral-700 hover:bg-neutral-200 focus:ring-neutral-400 active:bg-neutral-300;
+  }
+
+  /* Cards responsives */
+  .card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden;
+  }
+
+  .card-compact {
+    @apply card p-3 md:p-4;
+  }
+
+  .card-normal {
+    @apply card p-4 md:p-6;
+  }
+
+  /* Inputs responsifs (taille minimale pour éviter le zoom iOS) */
+  .input {
+    @apply block w-full px-3 py-2.5 md:px-4 md:py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base;
+  }
+
+  .label {
+    @apply block text-sm md:text-sm font-medium text-neutral-700 mb-1.5;
+  }
+
+  /* Container responsive */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  /* Gradients */
+  .gradient-primary {
+    background: linear-gradient(135deg, #0b3d91 0%, #3367bb 100%);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff9f7f 100%);
+  }
+
+  /* Texte responsive */
+  .text-responsive {
+    @apply text-sm md:text-base;
+  }
+
+  .text-responsive-lg {
+    @apply text-base md:text-lg lg:text-xl;
+  }
+
+  /* Espacements mobile */
+  .space-y-mobile {
+    @apply space-y-3 md:space-y-4 lg:space-y-6;
+  }
+
+  .gap-mobile {
+    @apply gap-3 md:gap-4 lg:gap-6;
+  }
+
+  /* Grilles responsives */
+  .grid-mobile {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .grid-mobile-compact {
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3;
+  }
+
+  /* Touch-friendly (minimum 44x44px pour les zones cliquables) */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Scrollbar custom (optionnel) */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  /* Hide scrollbar mais gardant la fonctionnalité */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Animations pour le logo */
+@keyframes spin-360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotate-360 {
+  animation: spin-360 1s ease-in-out;
+}
+
+/* Animation de rebond pour les clics */
+@keyframes bounce-click {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-5px) scale(1.1);
+  }
+  60% {
+    transform: translateY(-3px) scale(1.05);
+  }
+}
+
+.bounce-click {
+  animation: bounce-click 0.6s ease-in-out;
+}
+
