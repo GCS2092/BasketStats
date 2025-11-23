@@ -13,7 +13,19 @@ import { MessagesService } from './messages.service';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://192.168.1.118:3000', 'http://192.168.1.118:3001'],
+    origin: (origin, callback) => {
+      // Accepter toutes les origines en développement (localhost et réseau local)
+      if (!origin || 
+          origin.includes('localhost') || 
+          origin.includes('127.0.0.1') || 
+          origin.match(/^http:\/\/192\.168\.\d+\.\d+:\d+$/) ||
+          origin.match(/^http:\/\/10\.\d+\.\d+\.\d+:\d+$/) ||
+          origin.match(/^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   },
   transports: ['websocket', 'polling'],

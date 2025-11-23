@@ -241,25 +241,49 @@ npm run test:e2e       # Playwright
 
 ## 📦 Déploiement
 
-### Frontend (Vercel - gratuit)
+### Démarrage rapide (développement local)
 
+**Option 1 : Script automatique (recommandé)**
+```bash
+# Double-cliquez sur DEMARRER_PROJET.bat
+# ou exécutez :
+.\DEMARRER_PROJET.bat
+```
+
+**Option 2 : Manuel**
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run start:dev
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+### Accès réseau local
+
+Pour accéder depuis un autre appareil sur le même réseau :
+1. Exécutez `.\DEMARRER_RESEAU.ps1` pour configurer automatiquement
+2. Ou suivez le guide dans `CONFIGURATION_RESEAU.md`
+
+### Déploiement en production
+
+**Frontend (Vercel - gratuit)**
 ```bash
 cd frontend
 vercel deploy
 ```
 
-### Backend (Railway/Render - gratuit)
-
+**Backend (Railway/Render - gratuit)**
 1. Créer un projet sur Railway/Render
 2. Connecter le repo GitHub
 3. Ajouter les variables d'environnement
 4. Créer une base PostgreSQL managée
 5. Déployer !
 
-### Migration stockage vidéos (optionnel)
-
+**Migration stockage vidéos (optionnel)**
 Pour scaler, migrer vers **Cloudinary** (gratuit 25GB) :
-
 1. Créer compte Cloudinary
 2. Ajouter les variables d'environnement :
 ```env

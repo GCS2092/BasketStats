@@ -23,6 +23,79 @@ const nextConfig = {
         protocol: 'http',
         hostname: '0.0.0.0',
       },
+      // Support des IPs réseau local
+      {
+        protocol: 'http',
+        hostname: '192.168.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '10.*.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.16.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.17.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.18.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.19.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.20.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.21.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.22.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.23.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.24.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.25.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.26.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.27.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.28.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.29.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.30.*.*',
+      },
+      {
+        protocol: 'http',
+        hostname: '172.31.*.*',
+      },
       {
         protocol: 'https',
         hostname: '**',

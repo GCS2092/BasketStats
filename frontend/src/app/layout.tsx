@@ -28,6 +28,9 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'BasketStats',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
 };
 
 export default function RootLayout({
