@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: basketstats-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /api/health
+
+databases:
+  - name: basketstats-db
+    plan: free
+    databaseName: basketstats
+    user: basketstats_user
+
