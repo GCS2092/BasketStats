@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,7 +15,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuthSync } from '@/hooks/useAuth';
 import { UserGroupIcon, UserPlusIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 
-export default function MessagesPage() {
+function MessagesPageContent() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -445,5 +445,17 @@ export default function MessagesPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <MessagesPageContent />
+    </Suspense>
   );
 }
