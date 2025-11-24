@@ -3,7 +3,7 @@ services:
     name: basketstats-backend
     env: node
     plan: free
-    buildCommand: npm install --include=dev && npx prisma generate && npm run build && npx prisma migrate deploy
+    buildCommand: npm install --include=dev && npx prisma generate && npm run build && (npx prisma migrate resolve --rolled-back 20250120000000_add_onboarding_system 2>/dev/null || true) && npx prisma migrate deploy
     startCommand: npm run start:prod
     envVars:
       - key: NODE_ENV
