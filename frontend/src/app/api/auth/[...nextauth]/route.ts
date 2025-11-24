@@ -152,33 +152,36 @@ const handler = NextAuth(authOptions);
 // NextAuth v4 avec Next.js 14 App Router nécessite que request.query.nextauth soit défini
 export async function GET(
   request: NextRequest,
-  { params }: { params: { nextauth: string[] } }
+  { params }: { params: Promise<{ nextauth: string[] }> | { nextauth: string[] } }
 ) {
   try {
-    const nextauthPath = params.nextauth || [];
+    // Gérer params qui peut être une Promise (Next.js 15) ou un objet (Next.js 14)
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const nextauthPath = resolvedParams.nextauth || [];
     
-    // Créer un objet Request compatible avec NextAuth
-    // NextAuth s'attend à avoir request.query.nextauth et request.url
-    const modifiedRequest = new Request(request.url, {
-      method: 'GET',
-      headers: request.headers,
-    });
+    // Construire l'URL avec les paramètres pour NextAuth
+    const url = new URL(request.url);
+    const pathSegments = nextauthPath.join('/');
     
-    // Ajouter query.nextauth pour NextAuth
-    (modifiedRequest as any).query = { nextauth: nextauthPath };
+    // Créer un objet request compatible avec NextAuth v4
+    // NextAuth s'attend à request.query.nextauth
+    const modifiedRequest = Object.assign(request, {
+      query: { nextauth: nextauthPath },
+    }) as any;
     
-    // Appeler NextAuth et s'assurer qu'on retourne une Response valide
-    const response = await handler(modifiedRequest as any);
+    // Appeler NextAuth
+    const response = await handler(modifiedRequest);
     
-    // Si la réponse n'est pas une Response, la convertir
-    if (!(response instanceof Response)) {
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+    // S'assurer qu'on retourne une Response valide
+    if (response instanceof Response) {
+      return response;
     }
     
-    return response;
+    // Si ce n'est pas une Response, convertir
+    return new Response(JSON.stringify(response || {}), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error: any) {
     console.error('NextAuth GET Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
@@ -190,34 +193,32 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { nextauth: string[] } }
+  { params }: { params: Promise<{ nextauth: string[] }> | { nextauth: string[] } }
 ) {
   try {
-    const nextauthPath = params.nextauth || [];
-    const body = await request.text();
+    // Gérer params qui peut être une Promise (Next.js 15) ou un objet (Next.js 14)
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const nextauthPath = resolvedParams.nextauth || [];
     
-    // Créer un objet Request compatible avec NextAuth
-    const modifiedRequest = new Request(request.url, {
-      method: 'POST',
-      headers: request.headers,
-      body: body || undefined,
-    });
+    // Créer un objet request compatible avec NextAuth v4
+    // NextAuth s'attend à request.query.nextauth
+    const modifiedRequest = Object.assign(request, {
+      query: { nextauth: nextauthPath },
+    }) as any;
     
-    // Ajouter query.nextauth pour NextAuth
-    (modifiedRequest as any).query = { nextauth: nextauthPath };
+    // Appeler NextAuth
+    const response = await handler(modifiedRequest);
     
-    // Appeler NextAuth et s'assurer qu'on retourne une Response valide
-    const response = await handler(modifiedRequest as any);
-    
-    // Si la réponse n'est pas une Response, la convertir
-    if (!(response instanceof Response)) {
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+    // S'assurer qu'on retourne une Response valide
+    if (response instanceof Response) {
+      return response;
     }
     
-    return response;
+    // Si ce n'est pas une Response, convertir
+    return new Response(JSON.stringify(response || {}), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error: any) {
     console.error('NextAuth POST Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
