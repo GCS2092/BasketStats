@@ -8,16 +8,22 @@ function getApiBaseUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
-  // En développement, essayer de détecter l'IP du réseau depuis le navigateur
+  // En production (Vercel), utiliser l'URL de production par défaut
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    // Si on est sur une IP réseau (192.168.x.x, 10.x.x.x, etc.)
+    
+    // Si on est sur Vercel (production)
+    if (hostname.includes('vercel.app')) {
+      return 'https://basketstatsbackend.onrender.com/api';
+    }
+    
+    // Si on est sur une IP réseau (192.168.x.x, 10.x.x.x, etc.) - développement local
     if (hostname.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/)) {
       return `http://${hostname}:3001/api`;
     }
   }
   
-  // Par défaut, utiliser localhost
+  // Par défaut, utiliser localhost (développement local)
   return 'http://localhost:3001/api';
 }
 
