@@ -101,8 +101,14 @@ export class AuthService {
       data: { lastLogin: new Date() },
     });
 
-    // Vérifier l'abonnement de l'utilisateur
-    const hasActiveSubscription = await this.subscriptionService.hasActiveSubscription(user.id);
+    // Vérifier l'abonnement de l'utilisateur (avec gestion d'erreur)
+    let hasActiveSubscription = false;
+    try {
+      hasActiveSubscription = await this.subscriptionService.hasActiveSubscription(user.id);
+    } catch (error) {
+      // Si la vérification d'abonnement échoue, continuer sans bloquer le login
+      console.warn('Erreur lors de la vérification de l\'abonnement:', error);
+    }
 
     // Générer les tokens
     const tokens = await this.generateTokens(user.id, user.email, user.role);
