@@ -146,10 +146,32 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key-for-development-only',
 };
 
+// Créer le handler NextAuth
 const handler = NextAuth(authOptions);
 
+// Helper pour créer une requête compatible avec NextAuth v4
+function createNextAuthRequest(
+  request: NextRequest,
+  nextauthPath: string[]
+): any {
+  // Créer un objet qui simule une requête Express/Next.js Pages Router
+  const url = new URL(request.url);
+  
+  return {
+    method: request.method,
+    url: request.url,
+    headers: Object.fromEntries(request.headers.entries()),
+    query: {
+      nextauth: nextauthPath,
+    },
+    body: null, // Sera rempli pour POST
+    cookies: Object.fromEntries(
+      request.cookies.getAll().map(c => [c.name, c.value])
+    ),
+  };
+}
+
 // Wrapper functions pour compatibilité Next.js 14 App Router
-// NextAuth v4 avec Next.js 14 App Router nécessite que request.query.nextauth soit défini
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ nextauth: string[] }> | { nextauth: string[] } }
@@ -159,32 +181,29 @@ export async function GET(
     const resolvedParams = params instanceof Promise ? await params : params;
     const nextauthPath = resolvedParams.nextauth || [];
     
-    // Construire l'URL avec les paramètres pour NextAuth
-    const url = new URL(request.url);
-    const pathSegments = nextauthPath.join('/');
+    // Créer une requête compatible avec NextAuth v4
+    const nextAuthRequest = createNextAuthRequest(request, nextauthPath);
     
-    // Créer un objet request compatible avec NextAuth v4
-    // NextAuth s'attend à request.query.nextauth
-    const modifiedRequest = Object.assign(request, {
-      query: { nextauth: nextauthPath },
-    }) as any;
+    // Appeler NextAuth avec la requête modifiée
+    const response = await handler(nextAuthRequest);
     
-    // Appeler NextAuth
-    const response = await handler(modifiedRequest);
-    
-    // S'assurer qu'on retourne une Response valide
-    if (response instanceof Response) {
+    // NextAuth devrait toujours retourner une Response
+    if (response && response instanceof Response) {
       return response;
     }
     
-    // Si ce n'est pas une Response, convertir
-    return new Response(JSON.stringify(response || {}), {
-      status: 200,
+    // Fallback si NextAuth retourne quelque chose d'inattendu
+    console.warn('NextAuth returned non-Response:', typeof response);
+    return new Response(JSON.stringify({ error: 'Unexpected response from NextAuth' }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('NextAuth GET Error:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'Internal Server Error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -200,28 +219,38 @@ export async function POST(
     const resolvedParams = params instanceof Promise ? await params : params;
     const nextauthPath = resolvedParams.nextauth || [];
     
-    // Créer un objet request compatible avec NextAuth v4
-    // NextAuth s'attend à request.query.nextauth
-    const modifiedRequest = Object.assign(request, {
-      query: { nextauth: nextauthPath },
-    }) as any;
+    // Lire le body pour les requêtes POST
+    let body = null;
+    try {
+      body = await request.text();
+    } catch (e) {
+      // Body peut être vide ou déjà lu
+    }
     
-    // Appeler NextAuth
-    const response = await handler(modifiedRequest);
+    // Créer une requête compatible avec NextAuth v4
+    const nextAuthRequest = createNextAuthRequest(request, nextauthPath);
+    nextAuthRequest.body = body;
     
-    // S'assurer qu'on retourne une Response valide
-    if (response instanceof Response) {
+    // Appeler NextAuth avec la requête modifiée
+    const response = await handler(nextAuthRequest);
+    
+    // NextAuth devrait toujours retourner une Response
+    if (response && response instanceof Response) {
       return response;
     }
     
-    // Si ce n'est pas une Response, convertir
-    return new Response(JSON.stringify(response || {}), {
-      status: 200,
+    // Fallback si NextAuth retourne quelque chose d'inattendu
+    console.warn('NextAuth returned non-Response:', typeof response);
+    return new Response(JSON.stringify({ error: 'Unexpected response from NextAuth' }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('NextAuth POST Error:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'Internal Server Error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
