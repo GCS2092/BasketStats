@@ -22,6 +22,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:prod": "prisma migrate deploy",
     "prisma:migrate:fix": "bash scripts/fix-migrations.sh",
+    "prisma:clean-failed": "node scripts/clean-failed-migrations.js",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "prisma:reset": "prisma migrate reset",
