@@ -41,21 +41,6 @@ async function bootstrap() {
         const frontendUrl = process.env.FRONTEND_URL;
         const isDevelopment = process.env.NODE_ENV !== 'production';
         
-        // Liste des origines autorisées
-        const allowedOrigins: string[] = [];
-        
-        if (frontendUrl) {
-          // Ajouter l'URL exacte
-          allowedOrigins.push(frontendUrl);
-          // Ajouter avec/sans trailing slash
-          allowedOrigins.push(frontendUrl.replace(/\/$/, ''));
-          allowedOrigins.push(frontendUrl.endsWith('/') ? frontendUrl : `${frontendUrl}/`);
-          // Accepter tous les sous-domaines Vercel si c'est un domaine Vercel
-          if (frontendUrl.includes('vercel.app')) {
-            allowedOrigins.push(/^https:\/\/.*\.vercel\.app$/);
-          }
-        }
-        
         // En développement, accepter toutes les origines locales et réseau local
         const isLocalOrigin = !origin || 
             origin.includes('localhost') || 
@@ -64,32 +49,45 @@ async function bootstrap() {
             origin.match(/^http:\/\/10\.\d+\.\d+\.\d+:\d+$/) ||
             origin.match(/^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/);
         
-        // Vérifier si l'origine est autorisée
-        const isAllowedOrigin = origin && (
-          allowedOrigins.includes(origin) ||
-          allowedOrigins.some(pattern => {
-            if (pattern instanceof RegExp) {
-              return pattern.test(origin);
-            }
-            return false;
-          })
-        );
-        
-        // Accepter les origines autorisées ou locales en développement
+        // Accepter les origines locales en développement
         if (isDevelopment && isLocalOrigin) {
           callback(null, true);
-        } else if (isAllowedOrigin) {
-          callback(null, true);
-        } else if (!origin && isDevelopment) {
-          // Permettre les requêtes sans origin en développement (Postman, etc.)
-          callback(null, true);
-        } else {
-          // En production, log pour debug
-          if (!isDevelopment) {
-            console.log(`🚫 CORS bloqué: origin="${origin}", FRONTEND_URL="${frontendUrl}"`);
-          }
-          callback(new Error('Not allowed by CORS'));
+          return;
         }
+        
+        // Permettre les requêtes sans origin en développement (Postman, etc.)
+        if (!origin && isDevelopment) {
+          callback(null, true);
+          return;
+        }
+        
+        // En production, vérifier l'origine
+        if (!origin) {
+          callback(new Error('Not allowed by CORS'));
+          return;
+        }
+        
+        // Vérifier si l'origine correspond au frontend URL
+        if (frontendUrl) {
+          const normalizedFrontendUrl = frontendUrl.replace(/\/$/, '');
+          const normalizedOrigin = origin.replace(/\/$/, '');
+          
+          // Accepter l'URL exacte (avec/sans trailing slash)
+          if (normalizedOrigin === normalizedFrontendUrl) {
+            callback(null, true);
+            return;
+          }
+          
+          // Accepter tous les domaines Vercel si le frontend est sur Vercel
+          if (frontendUrl.includes('vercel.app') && origin.match(/^https:\/\/.*\.vercel\.app$/)) {
+            callback(null, true);
+            return;
+          }
+        }
+        
+        // En production, log pour debug
+        console.log(`🚫 CORS bloqué: origin="${origin}", FRONTEND_URL="${frontendUrl}"`);
+        callback(new Error('Not allowed by CORS'));
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
