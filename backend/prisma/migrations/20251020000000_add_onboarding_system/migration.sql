@@ -23,7 +23,7 @@ CREATE INDEX "onboarding_progress_user_id_idx" ON "onboarding_progress"("user_id
 CREATE INDEX "onboarding_progress_is_completed_idx" ON "onboarding_progress"("is_completed");
 
 -- AddForeignKey
-ALTER TABLE "onboarding_progress" ADD CONSTRAINT "onboarding_progress_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "onboarding_progress" ADD CONSTRAINT "onboarding_progress_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Create trigger for updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
