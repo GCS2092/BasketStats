@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import axios from 'axios';
+import { NextRequest } from 'next/server';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -147,12 +148,39 @@ export const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-// Wrapper functions pour compatibilité Next.js 14
-export function GET(request: Request) {
-  return (handler as any)(request);
+// Wrapper functions pour compatibilité Next.js 14 App Router
+// NextAuth v4 avec Next.js 14 App Router nécessite que request.query.nextauth soit défini
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { nextauth: string[] } }
+) {
+  // Créer un objet qui simule request.query pour NextAuth
+  const nextauthPath = params.nextauth || [];
+  
+  // Utiliser l'URL originale mais ajouter les paramètres dans query
+  const modifiedRequest = {
+    ...request,
+    query: { nextauth: nextauthPath },
+    url: request.url,
+  } as any;
+  
+  return handler(modifiedRequest);
 }
 
-export function POST(request: Request) {
-  return (handler as any)(request);
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { nextauth: string[] } }
+) {
+  // Créer un objet qui simule request.query pour NextAuth
+  const nextauthPath = params.nextauth || [];
+  
+  // Utiliser l'URL originale mais ajouter les paramètres dans query
+  const modifiedRequest = {
+    ...request,
+    query: { nextauth: nextauthPath },
+    url: request.url,
+  } as any;
+  
+  return handler(modifiedRequest);
 }
 
