@@ -154,33 +154,76 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { nextauth: string[] } }
 ) {
-  // Créer un objet qui simule request.query pour NextAuth
-  const nextauthPath = params.nextauth || [];
-  
-  // Utiliser l'URL originale mais ajouter les paramètres dans query
-  const modifiedRequest = {
-    ...request,
-    query: { nextauth: nextauthPath },
-    url: request.url,
-  } as any;
-  
-  return handler(modifiedRequest);
+  try {
+    const nextauthPath = params.nextauth || [];
+    
+    // Créer un objet Request compatible avec NextAuth
+    // NextAuth s'attend à avoir request.query.nextauth et request.url
+    const modifiedRequest = new Request(request.url, {
+      method: 'GET',
+      headers: request.headers,
+    });
+    
+    // Ajouter query.nextauth pour NextAuth
+    (modifiedRequest as any).query = { nextauth: nextauthPath };
+    
+    // Appeler NextAuth et s'assurer qu'on retourne une Response valide
+    const response = await handler(modifiedRequest as any);
+    
+    // Si la réponse n'est pas une Response, la convertir
+    if (!(response instanceof Response)) {
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    
+    return response;
+  } catch (error: any) {
+    console.error('NextAuth GET Error:', error);
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { nextauth: string[] } }
 ) {
-  // Créer un objet qui simule request.query pour NextAuth
-  const nextauthPath = params.nextauth || [];
-  
-  // Utiliser l'URL originale mais ajouter les paramètres dans query
-  const modifiedRequest = {
-    ...request,
-    query: { nextauth: nextauthPath },
-    url: request.url,
-  } as any;
-  
-  return handler(modifiedRequest);
+  try {
+    const nextauthPath = params.nextauth || [];
+    const body = await request.text();
+    
+    // Créer un objet Request compatible avec NextAuth
+    const modifiedRequest = new Request(request.url, {
+      method: 'POST',
+      headers: request.headers,
+      body: body || undefined,
+    });
+    
+    // Ajouter query.nextauth pour NextAuth
+    (modifiedRequest as any).query = { nextauth: nextauthPath };
+    
+    // Appeler NextAuth et s'assurer qu'on retourne une Response valide
+    const response = await handler(modifiedRequest as any);
+    
+    // Si la réponse n'est pas une Response, la convertir
+    if (!(response instanceof Response)) {
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    
+    return response;
+  } catch (error: any) {
+    console.error('NextAuth POST Error:', error);
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }
 
