@@ -730,47 +730,6 @@ model ClubApplication {
   @@map("club_applications")
 }
 
-model SubscriptionPlan {
-  id            String               @id @default(uuid()) @db.Uuid
-  name          String               @unique
-  type          SubscriptionPlanType @unique
-  description   String?
-  price         Decimal              @db.Decimal(10, 2)
-  duration      Int
-  features      Json
-  maxClubs      Int?
-  maxPlayers    Int?
-  isActive      Boolean              @default(true) @map("is_active")
-  createdAt     DateTime             @default(now()) @map("created_at")
-  updatedAt     DateTime             @updatedAt @map("updated_at")
-  subscriptions Subscription[]
-
-  @@index([type])
-  @@index([isActive])
-  @@map("subscription_plans")
-}
-
-model Subscription {
-  id            String             @id @default(uuid()) @db.Uuid
-  userId        String             @map("user_id") @db.Uuid
-  planId        String             @map("plan_id") @db.Uuid
-  status        SubscriptionStatus @default(PENDING)
-  startDate     DateTime           @map("start_date")
-  endDate       DateTime?          @map("end_date")
-  paymentMethod String?            @map("payment_method")
-  transactionId String?            @map("transaction_id")
-  autoRenew     Boolean            @default(false) @map("auto_renew")
-  createdAt     DateTime           @default(now()) @map("created_at")
-  updatedAt     DateTime           @updatedAt @map("updated_at")
-  plan          SubscriptionPlan   @relation(fields: [planId], references: [id])
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([status])
-  @@index([endDate])
-  @@map("subscriptions")
-}
-
 enum UserRole {
   PLAYER
   RECRUITER
@@ -903,36 +862,21 @@ enum ReportStatus {
   REJECTED
 }
 
-enum SubscriptionPlanType {
-  FREE
-  BASIC
-  PREMIUM
-  PROFESSIONAL
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  EXPIRED
-  CANCELLED
-  PENDING
-  TRIAL
-}
-
 // Modèle pour le progrès d'onboarding des utilisateurs
 model OnboardingProgress {
-  id              String   @id @default(uuid()) @db.Uuid
-  userId          String   @unique @map("user_id") @db.Uuid
-  currentStep     Int      @default(0) @map("current_step")
-  totalSteps      Int      @default(0) @map("total_steps")
-  completedSteps  String[] @default([]) @map("completed_steps")
-  isCompleted     Boolean  @default(false) @map("is_completed")
-  role            String   // Rôle de l'utilisateur pour personnaliser l'onboarding
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-  
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @unique @map("user_id") @db.Uuid
+  currentStep    Int      @default(0) @map("current_step")
+  totalSteps     Int      @default(0) @map("total_steps")
+  completedSteps String[] @default([]) @map("completed_steps")
+  isCompleted    Boolean  @default(false) @map("is_completed")
+  role           String // Rôle de l'utilisateur pour personnaliser l'onboarding
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
   // Relations
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([isCompleted])
   @@map("onboarding_progress")
@@ -946,11 +890,11 @@ model Friendship {
   status      FriendshipStatus @default(PENDING)
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
-  
+
   // Relations
-  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  addressee   User             @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
-  
+  requester User @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
   @@unique([requesterId, addresseeId])
   @@index([requesterId])
   @@index([addresseeId])
@@ -972,42 +916,42 @@ model SubscriptionPlan {
   type        SubscriptionPlanType @unique
   description String?
   price       Decimal              @db.Decimal(10, 2)
-  duration    Int                  // Durée en jours
-  features    Json                 // Fonctionnalités incluses
+  duration    Int // Durée en jours
+  features    Json // Fonctionnalités incluses
   maxClubs    Int?
   maxPlayers  Int?
   isActive    Boolean              @default(true) @map("is_active")
   createdAt   DateTime             @default(now()) @map("created_at")
   updatedAt   DateTime             @updatedAt @map("updated_at")
-  
+
   // Relations
   subscriptions Subscription[]
-  
+
   @@index([type])
   @@index([isActive])
   @@map("subscription_plans")
 }
 
 model Subscription {
-  id            String             @id @default(uuid()) @db.Uuid
-  userId        String             @map("user_id") @db.Uuid
-  planId        String             @map("plan_id") @db.Uuid
-  status        SubscriptionStatus @default(PENDING)
-  startDate     DateTime           @map("start_date")
-  endDate       DateTime?          @map("end_date")
-  paymentMethod String?            @map("payment_method")
-  transactionId String?            @map("transaction_id")
-  autoRenew     Boolean            @default(false) @map("auto_renew")
-  suspendedAt   DateTime?          @map("suspended_at") // Nouveau: Date de suspension
-  suspendedReason String?          @map("suspended_reason") // Nouveau: Raison de suspension
-  restoredAt    DateTime?          @map("restored_at") // Nouveau: Date de restauration
-  createdAt     DateTime           @default(now()) @map("created_at")
-  updatedAt     DateTime           @updatedAt @map("updated_at")
-  
+  id              String             @id @default(uuid()) @db.Uuid
+  userId          String             @map("user_id") @db.Uuid
+  planId          String             @map("plan_id") @db.Uuid
+  status          SubscriptionStatus @default(PENDING)
+  startDate       DateTime           @map("start_date")
+  endDate         DateTime?          @map("end_date")
+  paymentMethod   String?            @map("payment_method")
+  transactionId   String?            @map("transaction_id")
+  autoRenew       Boolean            @default(false) @map("auto_renew")
+  suspendedAt     DateTime?          @map("suspended_at") // Nouveau: Date de suspension
+  suspendedReason String?            @map("suspended_reason") // Nouveau: Raison de suspension
+  restoredAt      DateTime?          @map("restored_at") // Nouveau: Date de restauration
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
   // Relations
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan          SubscriptionPlan   @relation(fields: [planId], references: [id], onDelete: Restrict)
-  
+  user User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
   @@index([userId])
   @@index([status])
   @@index([endDate])
