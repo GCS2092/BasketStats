@@ -1,43 +1,24 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import FacebookProvider from 'next-auth/providers/facebook';
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
+import Facebook from 'next-auth/providers/facebook';
 import axios from 'axios';
-import { NextRequest } from 'next/server';
 
-export const authOptions: NextAuthOptions = {
+// Configuration NextAuth v5 (Auth.js) - Compatible avec Next.js 14 App Router
+const handler = NextAuth({
   providers: [
     // Google OAuth
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      profile(profile) {
-        return {
-          id: profile.sub,
-          email: profile.email,
-          name: profile.name,
-          image: profile.picture,
-          provider: 'google',
-        };
-      },
     }),
     // Facebook OAuth
-    FacebookProvider({
+    Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID || '',
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
-      profile(profile) {
-        return {
-          id: profile.id,
-          email: profile.email,
-          name: profile.name,
-          image: profile.picture?.data?.url,
-          provider: 'facebook',
-        };
-      },
     }),
     // Email & Password
-    CredentialsProvider({
-      name: 'Credentials',
+    Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Mot de passe', type: 'password' },
@@ -110,8 +91,8 @@ export const authOptions: NextAuthOptions = {
           user.id = backendUser.id;
           user.role = backendUser.role;
           user.verified = backendUser.verified;
-          user.accessToken = accessToken;
-          user.refreshToken = refreshToken;
+          (user as any).accessToken = accessToken;
+          (user as any).refreshToken = refreshToken;
 
           return true;
         } catch (error: any) {
@@ -123,10 +104,10 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user, account }) {
       if (user) {
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
-        token.role = user.role;
-        token.verified = user.verified;
+        token.accessToken = (user as any).accessToken;
+        token.refreshToken = (user as any).refreshToken;
+        token.role = (user as any).role;
+        token.verified = (user as any).verified;
         token.id = user.id;
         token.provider = account?.provider;
       }
@@ -134,126 +115,18 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.verified = token.verified as boolean;
-        session.accessToken = token.accessToken as string;
-        session.refreshToken = token.refreshToken as string;
+        (session.user as any).id = token.id as string;
+        (session.user as any).role = token.role as string;
+        (session.user as any).verified = token.verified as boolean;
+        (session as any).accessToken = token.accessToken as string;
+        (session as any).refreshToken = token.refreshToken as string;
       }
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key-for-development-only',
-};
+});
 
-// Créer le handler NextAuth
-const handler = NextAuth(authOptions);
-
-// Helper pour créer une requête compatible avec NextAuth v4
-function createNextAuthRequest(
-  request: NextRequest,
-  nextauthPath: string[]
-): any {
-  // Créer un objet qui simule une requête Express/Next.js Pages Router
-  const url = new URL(request.url);
-  
-  return {
-    method: request.method,
-    url: request.url,
-    headers: Object.fromEntries(request.headers.entries()),
-    query: {
-      nextauth: nextauthPath,
-    },
-    body: null, // Sera rempli pour POST
-    cookies: Object.fromEntries(
-      request.cookies.getAll().map(c => [c.name, c.value])
-    ),
-  };
-}
-
-// Wrapper functions pour compatibilité Next.js 14 App Router
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ nextauth: string[] }> | { nextauth: string[] } }
-) {
-  try {
-    // Gérer params qui peut être une Promise (Next.js 15) ou un objet (Next.js 14)
-    const resolvedParams = params instanceof Promise ? await params : params;
-    const nextauthPath = resolvedParams.nextauth || [];
-    
-    // Créer une requête compatible avec NextAuth v4
-    const nextAuthRequest = createNextAuthRequest(request, nextauthPath);
-    
-    // Appeler NextAuth avec la requête modifiée
-    const response = await handler(nextAuthRequest);
-    
-    // NextAuth devrait toujours retourner une Response
-    if (response && response instanceof Response) {
-      return response;
-    }
-    
-    // Fallback si NextAuth retourne quelque chose d'inattendu
-    console.warn('NextAuth returned non-Response:', typeof response);
-    return new Response(JSON.stringify({ error: 'Unexpected response from NextAuth' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (error: any) {
-    console.error('NextAuth GET Error:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message || 'Internal Server Error',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ nextauth: string[] }> | { nextauth: string[] } }
-) {
-  try {
-    // Gérer params qui peut être une Promise (Next.js 15) ou un objet (Next.js 14)
-    const resolvedParams = params instanceof Promise ? await params : params;
-    const nextauthPath = resolvedParams.nextauth || [];
-    
-    // Lire le body pour les requêtes POST
-    let body = null;
-    try {
-      body = await request.text();
-    } catch (e) {
-      // Body peut être vide ou déjà lu
-    }
-    
-    // Créer une requête compatible avec NextAuth v4
-    const nextAuthRequest = createNextAuthRequest(request, nextauthPath);
-    nextAuthRequest.body = body;
-    
-    // Appeler NextAuth avec la requête modifiée
-    const response = await handler(nextAuthRequest);
-    
-    // NextAuth devrait toujours retourner une Response
-    if (response && response instanceof Response) {
-      return response;
-    }
-    
-    // Fallback si NextAuth retourne quelque chose d'inattendu
-    console.warn('NextAuth returned non-Response:', typeof response);
-    return new Response(JSON.stringify({ error: 'Unexpected response from NextAuth' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (error: any) {
-    console.error('NextAuth POST Error:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message || 'Internal Server Error',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-}
-
+// NextAuth v5 supporte nativement Next.js 14 App Router
+// Plus besoin de wrapper complexe !
+export const { GET, POST } = handler;
