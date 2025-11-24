@@ -61,9 +61,10 @@ async function bootstrap() {
           return;
         }
         
-        // En production, vérifier l'origine
+        // Permettre les requêtes sans origin pour les health checks et outils (curl, etc.)
+        // Cela permet de tester l'API avec curl sans erreur CORS
         if (!origin) {
-          callback(new Error('Not allowed by CORS'));
+          callback(null, true);
           return;
         }
         
