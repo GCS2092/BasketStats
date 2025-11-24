@@ -5,7 +5,7 @@ import Facebook from 'next-auth/providers/facebook';
 import axios from 'axios';
 
 // Configuration NextAuth v5 (Auth.js) - Compatible avec Next.js 14 App Router
-const handler = NextAuth({
+const authConfig = {
   providers: [
     // Google OAuth
     Google({
@@ -125,8 +125,8 @@ const handler = NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key-for-development-only',
-});
+};
 
-// NextAuth v5 supporte nativement Next.js 14 App Router
-// Plus besoin de wrapper complexe !
-export const { GET, POST } = handler;
+// NextAuth v5 - Syntaxe correcte pour Next.js 14 App Router
+const { handlers } = NextAuth(authConfig);
+export const { GET, POST } = handlers;
