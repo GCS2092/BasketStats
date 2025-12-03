@@ -136,7 +136,61 @@ if (process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_SECRET) {
 }
 
 // NextAuth v5 - Syntaxe correcte pour Next.js 14 App Router
-const { handlers } = NextAuth(authConfig);
+let handlers: { GET: any; POST: any };
 
-// Export direct des handlers - NextAuth v5 beta gère automatiquement les routes dynamiques
-export const { GET, POST } = handlers;
+try {
+  // Vérifier les variables d'environnement avant d'initialiser NextAuth
+  console.log('🔍 [NextAuth] Initialisation...');
+  console.log('🔍 [NextAuth] NEXTAUTH_SECRET:', process.env.NEXTAUTH_SECRET ? '✅ Configuré' : '❌ MANQUANT');
+  console.log('🔍 [NextAuth] NEXTAUTH_URL:', process.env.NEXTAUTH_URL || '❌ MANQUANT');
+  console.log('🔍 [NextAuth] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL || '❌ MANQUANT');
+  
+  handlers = NextAuth(authConfig);
+  console.log('✅ [NextAuth] Initialisé avec succès');
+} catch (error: any) {
+  console.error('❌ [NextAuth] Erreur lors de l\'initialisation:', error);
+  console.error('❌ [NextAuth] Stack:', error?.stack);
+  throw error;
+}
+
+// Wrapper pour gérer les erreurs et logger les problèmes
+async function handleAuthRequest(
+  handler: (req: Request) => Promise<Response>,
+  req: Request,
+  method: string,
+): Promise<Response> {
+  try {
+    console.log(`🔍 [NextAuth] ${method} request reçue`);
+    const response = await handler(req);
+    console.log(`✅ [NextAuth] ${method} response status:`, response.status);
+    return response;
+  } catch (error: any) {
+    console.error(`❌ [NextAuth] Erreur dans ${method} handler:`, error);
+    console.error('❌ [NextAuth] Stack:', error?.stack);
+    console.error('❌ [NextAuth] Message:', error?.message);
+    
+    // Retourner une réponse JSON valide
+    return new Response(
+      JSON.stringify({
+        error: 'Internal Server Error',
+        message: error?.message || 'Une erreur est survenue lors de l\'authentification',
+        details: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }
+}
+
+// Export des handlers avec gestion d'erreur
+export async function GET(req: Request) {
+  return handleAuthRequest(handlers.GET, req, 'GET');
+}
+
+export async function POST(req: Request) {
+  return handleAuthRequest(handlers.POST, req, 'POST');
+}
