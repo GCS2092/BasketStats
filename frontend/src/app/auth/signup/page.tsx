@@ -249,10 +249,10 @@ export default function SignupPage() {
             </form>
           )}
 
+          {/* OAuth temporairement désactivé pour résoudre l'erreur HTTP 500 */}
           {/* Séparateur - OAuth uniquement visible au step 1 */}
-          {step === 'form' && (
+          {/* {step === 'form' && (
             <>
-          {/* Séparateur */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-neutral-300"></div>
@@ -262,7 +262,6 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Boutons OAuth */}
           <div className="space-y-3">
             <button
               type="button"
@@ -290,7 +289,7 @@ export default function SignupPage() {
             </button>
           </div>
           </>
-          )}
+          )} */}
 
           <div className="mt-6 text-center">
             <p className="text-neutral-600">

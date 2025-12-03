@@ -1,22 +1,23 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import Google from 'next-auth/providers/google';
-import Facebook from 'next-auth/providers/facebook';
+// Temporairement désactivé pour résoudre l'erreur HTTP 500
+// import Google from 'next-auth/providers/google';
+// import Facebook from 'next-auth/providers/facebook';
 import axios from 'axios';
 
 // Configuration NextAuth v5 (Auth.js) - Compatible avec Next.js 14 App Router
 const authConfig = {
   providers: [
-    // Google OAuth
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    }),
-    // Facebook OAuth
-    Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID || '',
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
-    }),
+    // Google OAuth - TEMPORAIREMENT DÉSACTIVÉ
+    // Google({
+    //   clientId: process.env.GOOGLE_CLIENT_ID || '',
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    // }),
+    // Facebook OAuth - TEMPORAIREMENT DÉSACTIVÉ
+    // Facebook({
+    //   clientId: process.env.FACEBOOK_CLIENT_ID || '',
+    //   clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
+    // }),
     // Email & Password
     Credentials({
       credentials: {
@@ -70,36 +71,37 @@ const authConfig = {
   },
   callbacks: {
     async signIn({ user, account }) {
+      // OAuth temporairement désactivé - cette partie ne sera pas appelée
       // Si c'est une connexion OAuth (Google/Facebook)
-      if (account?.provider === 'google' || account?.provider === 'facebook') {
-        try {
-          // Appeler notre backend pour créer/connecter l'utilisateur
-          const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/oauth`,
-            {
-              email: user.email,
-              fullName: user.name,
-              avatarUrl: user.image,
-              provider: account.provider,
-              // PAS de rôle spécifié = PLAYER par défaut côté backend
-            },
-          );
+      // if (account?.provider === 'google' || account?.provider === 'facebook') {
+      //   try {
+      //     // Appeler notre backend pour créer/connecter l'utilisateur
+      //     const response = await axios.post(
+      //       `${process.env.NEXT_PUBLIC_API_URL}/auth/oauth`,
+      //       {
+      //         email: user.email,
+      //         fullName: user.name,
+      //         avatarUrl: user.image,
+      //         provider: account.provider,
+      //         // PAS de rôle spécifié = PLAYER par défaut côté backend
+      //       },
+      //     );
 
-          const { user: backendUser, accessToken, refreshToken } = response.data;
+      //     const { user: backendUser, accessToken, refreshToken } = response.data;
 
-          // Ajouter les tokens à l'objet user
-          user.id = backendUser.id;
-          user.role = backendUser.role;
-          user.verified = backendUser.verified;
-          (user as any).accessToken = accessToken;
-          (user as any).refreshToken = refreshToken;
+      //     // Ajouter les tokens à l'objet user
+      //     user.id = backendUser.id;
+      //     user.role = backendUser.role;
+      //     user.verified = backendUser.verified;
+      //     (user as any).accessToken = accessToken;
+      //     (user as any).refreshToken = refreshToken;
 
-          return true;
-        } catch (error: any) {
-          console.error('Erreur OAuth backend:', error.response?.data || error.message);
-          return false;
-        }
-      }
+      //     return true;
+      //   } catch (error: any) {
+      //     console.error('Erreur OAuth backend:', error.response?.data || error.message);
+      //     return false;
+      //   }
+      // }
       return true;
     },
     async jwt({ token, user, account }) {
