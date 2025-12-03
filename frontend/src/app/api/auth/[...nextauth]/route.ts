@@ -136,7 +136,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_SECRET) {
 }
 
 // NextAuth v5 - Syntaxe correcte pour Next.js 14 App Router
-let handlers: { GET: any; POST: any };
+let handlers: any;
 
 try {
   // Vérifier les variables d'environnement avant d'initialiser NextAuth
@@ -145,7 +145,23 @@ try {
   console.log('🔍 [NextAuth] NEXTAUTH_URL:', process.env.NEXTAUTH_URL || '❌ MANQUANT');
   console.log('🔍 [NextAuth] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL || '❌ MANQUANT');
   
-  handlers = NextAuth(authConfig);
+  const authResult = NextAuth(authConfig);
+  console.log('🔍 [NextAuth] Type de retour:', typeof authResult);
+  console.log('🔍 [NextAuth] Clés:', authResult ? Object.keys(authResult) : 'null');
+  
+  // NextAuth v5 beta peut retourner { handlers: { GET, POST } } ou directement { GET, POST }
+  if (authResult && 'handlers' in authResult) {
+    handlers = authResult.handlers;
+    console.log('✅ [NextAuth] Handlers extraits depuis .handlers');
+  } else if (authResult && 'GET' in authResult && 'POST' in authResult) {
+    handlers = authResult;
+    console.log('✅ [NextAuth] Handlers extraits directement');
+  } else {
+    throw new Error(`Format de retour NextAuth inattendu: ${JSON.stringify(authResult)}`);
+  }
+  
+  console.log('🔍 [NextAuth] handlers.GET type:', typeof handlers?.GET);
+  console.log('🔍 [NextAuth] handlers.POST type:', typeof handlers?.POST);
   console.log('✅ [NextAuth] Initialisé avec succès');
 } catch (error: any) {
   console.error('❌ [NextAuth] Erreur lors de l\'initialisation:', error);
@@ -153,28 +169,45 @@ try {
   throw error;
 }
 
-// Wrapper pour gérer les erreurs et logger les problèmes
-async function handleAuthRequest(
-  handler: (req: Request) => Promise<Response>,
+// Export des handlers - NextAuth v5 beta gère automatiquement les routes dynamiques
+// Pour Next.js 14 App Router avec routes dynamiques, la signature doit inclure params
+export async function GET(
   req: Request,
-  method: string,
-): Promise<Response> {
+  { params }: { params: { nextauth: string[] } },
+) {
   try {
-    console.log(`🔍 [NextAuth] ${method} request reçue`);
-    const response = await handler(req);
-    console.log(`✅ [NextAuth] ${method} response status:`, response.status);
+    console.log('🔍 [NextAuth] GET request reçue');
+    console.log('🔍 [NextAuth] Params:', params);
+    
+    // Vérifier que handlers.GET est une fonction
+    if (typeof handlers.GET !== 'function') {
+      throw new Error(`handlers.GET n'est pas une fonction, type: ${typeof handlers.GET}`);
+    }
+    
+    // Appeler le handler avec la bonne signature pour NextAuth v5 beta
+    // NextAuth v5 beta peut nécessiter juste req ou req + context
+    let response: Response;
+    try {
+      // Essayer d'abord avec juste req (signature standard)
+      response = await handlers.GET(req);
+    } catch (e: any) {
+      // Si ça échoue, essayer avec params
+      console.log('⚠️ [NextAuth] Tentative avec params...');
+      response = await handlers.GET(req, { params });
+    }
+    
+    console.log(`✅ [NextAuth] GET response status:`, response.status);
     return response;
   } catch (error: any) {
-    console.error(`❌ [NextAuth] Erreur dans ${method} handler:`, error);
+    console.error('❌ [NextAuth] Erreur dans GET handler:', error);
     console.error('❌ [NextAuth] Stack:', error?.stack);
     console.error('❌ [NextAuth] Message:', error?.message);
+    console.error('❌ [NextAuth] handlers.GET type:', typeof handlers.GET);
     
-    // Retourner une réponse JSON valide
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
         message: error?.message || 'Une erreur est survenue lors de l\'authentification',
-        details: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
       }),
       {
         status: 500,
@@ -186,11 +219,47 @@ async function handleAuthRequest(
   }
 }
 
-// Export des handlers avec gestion d'erreur
-export async function GET(req: Request) {
-  return handleAuthRequest(handlers.GET, req, 'GET');
-}
-
-export async function POST(req: Request) {
-  return handleAuthRequest(handlers.POST, req, 'POST');
+export async function POST(
+  req: Request,
+  { params }: { params: { nextauth: string[] } },
+) {
+  try {
+    console.log('🔍 [NextAuth] POST request reçue');
+    console.log('🔍 [NextAuth] Params:', params);
+    
+    // Vérifier que handlers.POST est une fonction
+    if (typeof handlers.POST !== 'function') {
+      throw new Error(`handlers.POST n'est pas une fonction, type: ${typeof handlers.POST}`);
+    }
+    
+    // Appeler le handler avec la bonne signature
+    let response: Response;
+    try {
+      response = await handlers.POST(req);
+    } catch (e: any) {
+      console.log('⚠️ [NextAuth] Tentative avec params...');
+      response = await handlers.POST(req, { params });
+    }
+    
+    console.log(`✅ [NextAuth] POST response status:`, response.status);
+    return response;
+  } catch (error: any) {
+    console.error('❌ [NextAuth] Erreur dans POST handler:', error);
+    console.error('❌ [NextAuth] Stack:', error?.stack);
+    console.error('❌ [NextAuth] Message:', error?.message);
+    console.error('❌ [NextAuth] handlers.POST type:', typeof handlers.POST);
+    
+    return new Response(
+      JSON.stringify({
+        error: 'Internal Server Error',
+        message: error?.message || 'Une erreur est survenue lors de l\'authentification',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }
 }
