@@ -97,14 +97,48 @@ export function usePersistentAuth(options: PersistentAuthOptions = {}) {
     const checkTokenValidity = async () => {
       try {
         const response = await fetch('/api/auth/session');
-        const data = await response.json();
+        
+        // Vérifier si la réponse est OK
+        if (!response.ok) {
+          console.log('🔒 [AUTH] Session invalide, déconnexion...');
+          await signOut({ callbackUrl: '/' });
+          return;
+        }
 
-        if (!data.user) {
+        // Vérifier si la réponse a du contenu avant de parser
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.log('🔒 [AUTH] Réponse invalide, déconnexion...');
+          await signOut({ callbackUrl: '/' });
+          return;
+        }
+
+        // Vérifier si le body n'est pas vide
+        const text = await response.text();
+        if (!text || text.trim().length === 0) {
+          console.log('🔒 [AUTH] Session vide, déconnexion...');
+          await signOut({ callbackUrl: '/' });
+          return;
+        }
+
+        // Parser le JSON seulement si on a du contenu valide
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error('❌ [AUTH] Erreur de parsing JSON:', parseError);
+          await signOut({ callbackUrl: '/' });
+          return;
+        }
+
+        if (!data || !data.user) {
           console.log('🔒 [AUTH] Token expiré, déconnexion...');
           await signOut({ callbackUrl: '/' });
         }
       } catch (error) {
         console.error('❌ [AUTH] Erreur lors de la vérification du token:', error);
+        // En cas d'erreur réseau ou autre, ne pas déconnecter automatiquement
+        // pour éviter les déconnexions intempestives
       }
     };
 

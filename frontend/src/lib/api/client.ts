@@ -43,8 +43,15 @@ apiClient.interceptors.request.use(
       
       // Si pas de token dans localStorage, récupérer depuis NextAuth session
       if (!token) {
-        const session = await getSession();
-        token = session?.accessToken || null;
+        try {
+          const session = await getSession();
+          token = session?.accessToken || null;
+        } catch (error) {
+          // En cas d'erreur lors de la récupération de la session (ex: JSON parse error)
+          // On continue sans token plutôt que de bloquer la requête
+          console.warn('⚠️ [API] Erreur lors de la récupération de la session NextAuth:', error);
+          token = null;
+        }
       }
       
       if (token) {
