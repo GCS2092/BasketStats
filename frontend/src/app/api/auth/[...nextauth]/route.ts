@@ -134,71 +134,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_SECRET) {
 }
 
 // NextAuth v5 - Syntaxe correcte pour Next.js 14 App Router
-let handlers: { GET: any; POST: any };
-try {
-  handlers = NextAuth(authConfig);
-} catch (error: any) {
-  console.error('❌ [NextAuth] Erreur lors de l\'initialisation:', error);
-  throw error;
-}
+const { handlers } = NextAuth(authConfig);
 
-// Wrapper pour gérer les erreurs et éviter les réponses vides
-async function handleRequest(
-  handler: (req: Request) => Promise<Response>,
-  req: Request,
-): Promise<Response> {
-  try {
-    const response = await handler(req);
-    
-    // Vérifier si la réponse est valide
-    if (!response || !(response instanceof Response)) {
-      throw new Error('Handler a retourné une réponse invalide');
-    }
-    
-    // S'assurer que la réponse a toujours un Content-Type si elle est vide
-    const contentType = response.headers.get('Content-Type');
-    if (!contentType && response.status !== 204) {
-      // Si pas de Content-Type et pas de contenu, ajouter application/json
-      const clonedResponse = new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: {
-          ...Object.fromEntries(response.headers.entries()),
-          'Content-Type': 'application/json',
-        },
-      });
-      return clonedResponse;
-    }
-    
-    return response;
-  } catch (error: any) {
-    console.error('❌ [NextAuth] Erreur dans le route handler:', error);
-    console.error('❌ [NextAuth] Stack:', error?.stack);
-    console.error('❌ [NextAuth] NEXTAUTH_SECRET configuré:', !!process.env.NEXTAUTH_SECRET);
-    console.error('❌ [NextAuth] NEXTAUTH_URL configuré:', !!process.env.NEXTAUTH_URL);
-    console.error('❌ [NextAuth] NEXT_PUBLIC_API_URL configuré:', !!process.env.NEXT_PUBLIC_API_URL);
-    
-    // Retourner une réponse JSON valide même en cas d'erreur
-    return new Response(
-      JSON.stringify({
-        error: 'Internal Server Error',
-        message: error?.message || 'Une erreur est survenue lors de l\'authentification',
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-  }
-}
-
-// Export des handlers avec gestion d'erreur
-export async function GET(req: Request) {
-  return handleRequest(handlers.GET, req);
-}
-
-export async function POST(req: Request) {
-  return handleRequest(handlers.POST, req);
-}
+// Export direct des handlers - NextAuth v5 beta gère automatiquement les routes dynamiques
+export const { GET, POST } = handlers;
