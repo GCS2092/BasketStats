@@ -49,8 +49,18 @@ export class NewsService {
           allNews.push(...news);
           console.log(`✅ ${news.length} articles récupérés depuis ${feedUrl}`);
         }
-      } catch (error) {
-        console.error(`❌ Erreur flux ${feedUrl}:`, error.message);
+      } catch (error: any) {
+        // Afficher plus de détails sur l'erreur pour le débogage
+        const errorMessage = error.message || 'Erreur inconnue';
+        const errorDetails = error.response?.status 
+          ? `Status: ${error.response.status}` 
+          : '';
+        console.error(`❌ Erreur flux ${feedUrl}: ${errorMessage}${errorDetails ? ` - ${errorDetails}` : ''}`);
+        
+        // Si c'est une erreur de parsing XML, continuer avec les autres flux
+        if (errorMessage.includes('Invalid character') || errorMessage.includes('entity')) {
+          console.warn(`⚠️ Flux ${feedUrl} ignoré (XML mal formé), continuation avec les autres flux...`);
+        }
       }
     }
 
@@ -62,38 +72,82 @@ export class NewsService {
 
   private async parseRSSFeed(xmlContent: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
-      parseString(xmlContent, (err, result) => {
+      // Nettoyer le XML avant le parsing pour éviter les erreurs d'entités mal formées
+      let cleanedXml = xmlContent;
+      
+      // Remplacer les entités XML mal formées ou non standard
+      cleanedXml = cleanedXml.replace(/&(?![a-zA-Z]+;|#\d+;|#x[0-9a-fA-F]+;)/g, '&amp;');
+      
+      // Options de parsing plus permissives
+      const parseOptions = {
+        trim: true,
+        explicitArray: false,
+        mergeAttrs: false,
+        explicitRoot: false,
+        ignoreAttrs: false,
+        attrkey: '$',
+        charkey: '_',
+        // Ignorer les erreurs d'entités non reconnues
+        ignoreDeclaration: false,
+        // Permettre les caractères non-ASCII
+        normalize: true,
+        normalizeTags: false,
+        // Gérer les CDATA
+        explicitCharkey: false,
+      };
+
+      parseString(cleanedXml, parseOptions, (err, result) => {
         if (err) {
-          reject(err);
+          // Si le parsing échoue, essayer avec un nettoyage plus agressif
+          try {
+            // Supprimer les entités problématiques
+            cleanedXml = cleanedXml.replace(/&[^#\w]+;/g, '');
+            parseString(cleanedXml, parseOptions, (retryErr, retryResult) => {
+              if (retryErr) {
+                console.warn(`⚠️ Erreur parsing RSS après nettoyage: ${retryErr.message}`);
+                resolve([]); // Retourner un tableau vide plutôt que d'échouer
+                return;
+              }
+              this.processRSSResult(retryResult, resolve);
+            });
+          } catch (cleanError) {
+            console.warn(`⚠️ Erreur nettoyage RSS: ${cleanError.message}`);
+            resolve([]); // Retourner un tableau vide plutôt que d'échouer
+          }
           return;
         }
 
-        try {
-          const items = result?.rss?.channel?.[0]?.item || result?.feed?.entry || [];
-          const news = items.map((item: any, index: number) => {
-            const title = item.title?.[0] || item.title || 'Titre non disponible';
-            const description = item.description?.[0] || item.summary?.[0] || item.content?.[0]?._ || '';
-            const link = item.link?.[0] || item.link?.[0]?.$?.href || '#';
-            const pubDate = item.pubDate?.[0] || item.published?.[0] || new Date().toISOString();
-            const source = this.extractSourceFromURL(link);
-
-            return {
-              id: `rss-${Date.now()}-${index}`,
-              title: this.cleanText(title),
-              description: this.cleanText(description).substring(0, 200) + '...',
-              url: link,
-              publishedAt: new Date(pubDate).toISOString(),
-              source: source,
-              image: this.extractImageFromContent(description),
-            };
-          });
-
-          resolve(news);
-        } catch (parseError) {
-          reject(parseError);
-        }
+        this.processRSSResult(result, resolve);
       });
     });
+  }
+
+  private processRSSResult(result: any, resolve: (value: any[]) => void) {
+    try {
+      const items = result?.rss?.channel?.[0]?.item || result?.feed?.entry || [];
+      const news = items.map((item: any, index: number) => {
+        const title = item.title?.[0] || item.title || 'Titre non disponible';
+        const description = item.description?.[0] || item.summary?.[0] || item.content?.[0]?._ || '';
+        const link = item.link?.[0] || item.link?.[0]?.$?.href || '#';
+        const pubDate = item.pubDate?.[0] || item.published?.[0] || new Date().toISOString();
+        const source = this.extractSourceFromURL(link);
+
+        return {
+          id: `rss-${Date.now()}-${index}`,
+          title: this.cleanText(title),
+          description: this.cleanText(description).substring(0, 200) + '...',
+          url: link,
+          publishedAt: new Date(pubDate).toISOString(),
+          source: source,
+          image: this.extractImageFromContent(description),
+        };
+      });
+
+      resolve(news);
+    } catch (parseError) {
+      console.warn(`⚠️ Erreur traitement RSS: ${parseError.message}`);
+      resolve([]); // Retourner un tableau vide plutôt que d'échouer
+    }
   }
 
   private extractSourceFromURL(url: string): string {

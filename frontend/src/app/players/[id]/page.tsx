@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import apiClient from '@/lib/api/client';
 import Header from '@/components/layout/Header';
@@ -11,9 +13,12 @@ import VideoGallery from '@/components/player/VideoGallery';
 import PhotoGallery from '@/components/player/PhotoGallery';
 import StatsForm from '@/components/player/StatsForm';
 
+export const dynamic = 'force-dynamic';
+
 export default function PlayerProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations();
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   const userId = params.id as string;

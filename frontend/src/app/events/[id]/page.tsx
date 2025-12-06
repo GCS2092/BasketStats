@@ -8,9 +8,12 @@ import NavigationBreadcrumb from '@/components/common/NavigationBreadcrumb';
 import ElegantQuickNavigation from '@/components/common/ElegantQuickNavigation';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations();
   const { data: session } = useSession();
   const eventId = params.id as string;
 

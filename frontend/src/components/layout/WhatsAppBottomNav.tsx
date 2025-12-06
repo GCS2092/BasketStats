@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api/client';
 import { useNotifications } from '@/contexts/NotificationContext';
+import { Link, usePathname as useI18nPathname } from '@/i18n/routing';
+import { usePathname as useNextPathname } from 'next/navigation';
 
 interface NavItem {
   href: string;
@@ -17,8 +17,17 @@ interface NavItem {
 
 export default function WhatsAppBottomNav() {
   const { data: session } = useSession();
-  const pathname = usePathname();
   const { unreadCount } = useNotifications();
+  
+  // Utiliser usePathname de next-intl si disponible, sinon celui de next/navigation
+  let pathname: string;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    pathname = useI18nPathname();
+  } catch {
+    // Fallback si on n'est pas dans le contexte i18n
+    pathname = useNextPathname() || '';
+  }
 
   // Récupérer le nombre de notifications non lues
   const { data: notifData } = useQuery({

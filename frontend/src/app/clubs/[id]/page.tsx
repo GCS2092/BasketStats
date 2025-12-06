@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api/client';
@@ -9,6 +11,8 @@ import Header from '@/components/layout/Header';
 import NavigationBreadcrumb from '@/components/common/NavigationBreadcrumb';
 import { useAuthSync } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+
+export const dynamic = 'force-dynamic';
 
 interface Club {
   id: string;

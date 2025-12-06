@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useSession, signOut } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api/client';
@@ -9,6 +9,7 @@ import { useNotifications } from '@/contexts/NotificationContext';
 import SimpleNavigation from '@/components/common/SimpleNavigation';
 import PersistentLogoutButton from '@/components/common/PersistentLogoutButton';
 import AnimatedLogo from '@/components/common/AnimatedLogo';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
 export default function Header() {
   const { data: session } = useSession();
@@ -37,6 +38,11 @@ export default function Header() {
 
           {/* Menu desktop uniquement (le hamburger est remplacé par la barre flottante) */}
           <SimpleNavigation type="desktop" />
+
+          {/* Sélecteur de langue */}
+          <div className="hidden md:flex">
+            <LanguageSwitcher />
+          </div>
 
           <div className="flex items-center gap-2 md:gap-4">
             {session?.user && (
