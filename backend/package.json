@@ -28,7 +28,8 @@
     "prisma:reset": "prisma migrate reset",
     "generate-vapid": "ts-node scripts/generate-vapid.ts",
     "reset-passwords": "ts-node scripts/reset-all-passwords.ts",
-    "activate-user": "ts-node scripts/activate-user-premium.ts"
+    "activate-user": "ts-node scripts/activate-user-premium.ts",
+    "list-subscriptions": "ts-node scripts/list-subscriptions-and-roles.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",
