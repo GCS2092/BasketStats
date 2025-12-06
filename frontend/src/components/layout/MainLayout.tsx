@@ -10,6 +10,7 @@ import ProfileCompletionBanner from '../notifications/ProfileCompletionBanner';
 import MobileBackButton from '../common/MobileBackButton';
 import PersistentAuthIndicator from '../common/PersistentAuthIndicator';
 import MobilePersistenceTest from '../test/MobilePersistenceTest';
+import WhatsAppBottomNav from './WhatsAppBottomNav';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -37,6 +38,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const noNotificationPages = ['/auth/login', '/auth/register', '/profile/edit'];
   const showNotifications = !noNotificationPages.includes(pathname) && session?.user?.role === 'PLAYER';
 
+  // Pages où la barre de navigation ne doit pas s'afficher (pas de padding-bottom)
+  const isAdminPage = pathname.startsWith('/admin') && session?.user?.role === 'ADMIN';
+  const isAuthPage = pathname.startsWith('/auth/');
+  const shouldShowBottomNav = !isAdminPage && !isAuthPage;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Bannière de complétion de profil (mobile) */}
@@ -50,9 +56,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <MobileBackButton />
       
       {/* Contenu principal */}
-      <main>
+      <main className={shouldShowBottomNav ? 'pb-16 md:pb-0' : ''}>
         {children}
       </main>
+
+      {/* Barre de navigation flottante style WhatsApp */}
+      <WhatsAppBottomNav />
 
       {/* Notification de complétion de profil (desktop) */}
       {showNotifications && (

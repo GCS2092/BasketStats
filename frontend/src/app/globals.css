@@ -145,6 +145,11 @@
     @apply min-h-[44px] min-w-[44px];
   }
 
+  /* Safe area pour les appareils avec encoche (iPhone X+) */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   /* Scrollbar custom (optionnel) */
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;

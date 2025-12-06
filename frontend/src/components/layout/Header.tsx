@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api/client';
 import { useNotifications } from '@/contexts/NotificationContext';
 import SimpleNavigation from '@/components/common/SimpleNavigation';
-import ElegantHamburgerMenu from './ElegantHamburgerMenu';
 import PersistentLogoutButton from '@/components/common/PersistentLogoutButton';
 import AnimatedLogo from '@/components/common/AnimatedLogo';
 
@@ -36,10 +35,7 @@ export default function Header() {
             <AnimatedLogo />
           </Link>
 
-          {/* Menu hamburger élégant */}
-          <ElegantHamburgerMenu unreadNotifications={unreadNotifications} />
-
-          {/* Menu desktop */}
+          {/* Menu desktop uniquement (le hamburger est remplacé par la barre flottante) */}
           <SimpleNavigation type="desktop" />
 
           <div className="flex items-center gap-2 md:gap-4">
