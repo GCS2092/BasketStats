@@ -2,19 +2,32 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import BasketballNews from '@/components/news/BasketballNews';
+import NBAScores from '@/components/news/NBAScores';
 
 export default function HomePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'news' | 'scores'>('news');
 
   useEffect(() => {
     if (status === 'authenticated') {
       router.push('/feed');
     }
   }, [status, router]);
+
+  // Gérer l'onglet actif depuis l'URL au chargement
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'scores' || tab === 'news') {
+        setActiveTab(tab);
+      }
+    }
+  }, []);
 
   if (status === 'loading') {
     return (
@@ -28,7 +41,7 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="gradient-primary text-white">
-        <div className="container-custom py-20">
+        <div className="container-custom py-12 md:py-20">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               🏀 Bball Connect
@@ -48,10 +61,55 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Section Actualités pleine largeur */}
-      <section className="py-20 bg-white">
+      {/* Section Actualités et Scores avec onglets */}
+      <section className="py-8 md:py-12 bg-white">
         <div className="container-custom">
-          <BasketballNews />
+          {/* Onglets */}
+          <div className="mb-6">
+            <div className="flex space-x-1 bg-neutral-200 rounded-lg p-1 max-w-md mx-auto">
+              <button
+                onClick={() => {
+                  setActiveTab('news');
+                  router.push('/?tab=news', { scroll: false });
+                }}
+                className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors text-sm ${
+                  activeTab === 'news'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-neutral-600 hover:text-primary'
+                }`}
+              >
+                📰 Actualités
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('scores');
+                  router.push('/?tab=scores', { scroll: false });
+                }}
+                className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors text-sm ${
+                  activeTab === 'scores'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-neutral-600 hover:text-primary'
+                }`}
+              >
+                🏀 Matchs
+              </button>
+            </div>
+          </div>
+
+          {/* Contenu selon l'onglet actif */}
+          {activeTab === 'news' && (
+            <div className="space-y-4">
+              <h2 className="text-xl md:text-2xl font-bold text-center mb-6">Dernières actualités</h2>
+              <BasketballNews />
+            </div>
+          )}
+
+          {activeTab === 'scores' && (
+            <div className="space-y-4">
+              <h2 className="text-xl md:text-2xl font-bold text-center mb-6">Scores NBA récents</h2>
+              <NBAScores />
+            </div>
+          )}
         </div>
       </section>
 

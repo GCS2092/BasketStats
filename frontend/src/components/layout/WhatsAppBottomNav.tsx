@@ -55,13 +55,15 @@ export default function WhatsAppBottomNav() {
   // Navigation items selon les rôles
   const getNavigationItems = (): NavItem[] => {
     if (!session?.user) {
-      // Navigation publique (visiteurs non connectés)
-      return [
-        { href: '/feed', label: 'Feed', icon: '📰', roles: ['GUEST'] },
-        { href: '/players', label: 'Joueurs', icon: '👥', roles: ['GUEST'] },
-        { href: '/clubs', label: 'Clubs', icon: '🏢', roles: ['GUEST'] },
-        { href: '/events', label: 'Événements', icon: '📅', roles: ['GUEST'] },
-      ];
+      // Navigation publique (visiteurs non connectés) - seulement 2 boutons sur la page d'accueil
+      if (pathname === '/' || pathname.startsWith('/?')) {
+        return [
+          { href: '/?tab=news', label: 'Actualités', icon: '📰', roles: ['GUEST'] },
+          { href: '/?tab=scores', label: 'Matchs', icon: '🏀', roles: ['GUEST'] },
+        ];
+      }
+      // Sur les autres pages, pas de navigation (redirection vers login)
+      return [];
     }
 
     const user = session.user;
@@ -127,7 +129,11 @@ export default function WhatsAppBottomNav() {
   // Filtrer les items selon les permissions
   const allowedItems = navigationItems.filter(item => {
     if (!session?.user) {
-      return item.roles.includes('GUEST');
+      // Pour les visiteurs, seulement sur la page d'accueil
+      if (pathname === '/' || pathname.startsWith('/?')) {
+        return item.roles.includes('GUEST');
+      }
+      return false;
     }
 
     const user = session.user;
@@ -145,6 +151,11 @@ export default function WhatsAppBottomNav() {
     return true;
   });
 
+  // Si aucun item n'est autorisé, ne pas afficher la barre
+  if (allowedItems.length === 0) {
+    return null;
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] md:hidden">
       <div className="flex items-center justify-around h-16 px-2 safe-area-bottom">
@@ -152,6 +163,10 @@ export default function WhatsAppBottomNav() {
           // Détection de la page active
           let isActive = false;
           if (item.href === pathname) {
+            isActive = true;
+          } else if (item.href === '/?tab=news' && (pathname === '/' || pathname.startsWith('/?tab=news') || (pathname === '/' && !pathname.includes('tab=scores')))) {
+            isActive = true;
+          } else if (item.href === '/?tab=scores' && pathname.includes('tab=scores')) {
             isActive = true;
           } else if (item.href === '/notifications' && pathname.startsWith('/notifications')) {
             isActive = true;
@@ -164,7 +179,7 @@ export default function WhatsAppBottomNav() {
             if (itemUserId === pathUserId) {
               isActive = true;
             }
-          } else if (item.href === '/feed' && (pathname === '/' || pathname === '/feed')) {
+          } else if (item.href === '/feed' && (pathname === '/feed')) {
             isActive = true;
           } else if (item.href === '/dashboard' && pathname.startsWith('/dashboard')) {
             isActive = true;
