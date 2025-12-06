@@ -5,17 +5,37 @@ import * as nodemailer from 'nodemailer';
 export class SubscriptionEmailService {
   private transporter: nodemailer.Transporter;
 
+  private isEmailConfigured(): boolean {
+    return !!(process.env.MAIL_USERNAME && process.env.MAIL_PASSWORD);
+  }
+
+  private checkEmailConfig(): boolean {
+    if (!this.isEmailConfigured()) {
+      console.warn('⚠️ [SubscriptionEmail] SMTP non configuré - Email non envoyé');
+      return false;
+    }
+    if (!this.transporter) {
+      console.warn('⚠️ [SubscriptionEmail] Transporter non initialisé - Email non envoyé');
+      return false;
+    }
+    return true;
+  }
+
   constructor() {
-    // Configurer le transporteur email
-    this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.MAIL_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
+    // Configurer le transporteur email seulement si les credentials sont configurés
+    if (this.isEmailConfigured()) {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.MAIL_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USERNAME,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      });
+    } else {
+      console.warn('⚠️ [SubscriptionEmail] SMTP non configuré - Les emails d\'abonnement ne seront pas envoyés');
+    }
   }
 
   /**
@@ -30,6 +50,8 @@ export class SubscriptionEmailService {
     currency: string = 'XOF',
     endDate?: Date
   ) {
+    if (!this.checkEmailConfig()) return;
+
     try {
       const subject = `🎉 Votre abonnement ${planName} est activé !`;
       
@@ -148,6 +170,8 @@ export class SubscriptionEmailService {
     amount: number,
     currency: string = 'XOF'
   ) {
+    if (!this.checkEmailConfig()) return;
+
     try {
       const subject = `🔄 Votre abonnement a été mis à jour vers ${newPlanName}`;
       

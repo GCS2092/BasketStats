@@ -25,36 +25,47 @@ export class AuthOtpService {
     // Stocker le code en mémoire (ou Redis en production)
     this.otpStore.set(email, { code, expiresAt });
 
-    // Envoyer l'email
-    const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.MAIL_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
+    // Vérifier si les credentials SMTP sont configurés
+    if (!process.env.MAIL_USERNAME || !process.env.MAIL_PASSWORD) {
+      console.warn(`⚠️ [AuthOtp] SMTP non configuré - Code OTP généré pour ${email}: ${code} (non envoyé par email)`);
+      return;
+    }
 
-    await transporter.sendMail({
-      from: `"BasketStats" <${process.env.MAIL_FROM_ADDRESS}>`,
-      to: email,
-      subject: 'Votre code de vérification BasketStats',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #3B82F6;">🏀 BasketStats</h1>
-          <h2>Code de vérification</h2>
-          <p>Votre code de vérification est :</p>
-          <div style="background: #F3F4F6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1F2937; border-radius: 8px;">
-            ${code}
+    try {
+      // Envoyer l'email
+      const transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.MAIL_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USERNAME,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"BasketStats" <${process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME}>`,
+        to: email,
+        subject: 'Votre code de vérification BasketStats',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #3B82F6;">🏀 BasketStats</h1>
+            <h2>Code de vérification</h2>
+            <p>Votre code de vérification est :</p>
+            <div style="background: #F3F4F6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1F2937; border-radius: 8px;">
+              ${code}
+            </div>
+            <p style="color: #6B7280; margin-top: 20px;">Ce code expire dans 10 minutes.</p>
+            <p style="color: #6B7280;">Si vous n'avez pas demandé ce code, ignorez cet email.</p>
           </div>
-          <p style="color: #6B7280; margin-top: 20px;">Ce code expire dans 10 minutes.</p>
-          <p style="color: #6B7280;">Si vous n'avez pas demandé ce code, ignorez cet email.</p>
-        </div>
-      `,
-    });
+        `,
+      });
 
-    console.log(`📧 Code OTP envoyé à ${email}: ${code}`);
+      console.log(`📧 Code OTP envoyé à ${email}: ${code}`);
+    } catch (error: any) {
+      console.error(`❌ [AuthOtp] Erreur lors de l'envoi de l'email OTP:`, error.message);
+      // Ne pas faire échouer la requête si l'email échoue
+    }
   }
 
   /**

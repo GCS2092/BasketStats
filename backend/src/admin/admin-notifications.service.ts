@@ -5,23 +5,36 @@ import * as nodemailer from 'nodemailer';
 export class AdminNotificationsService {
   private transporter: nodemailer.Transporter;
 
+  private isEmailConfigured(): boolean {
+    return !!(process.env.MAIL_USERNAME && process.env.MAIL_PASSWORD);
+  }
+
   constructor() {
-    // Configurer le transporteur email
-    this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.MAIL_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
+    // Configurer le transporteur email seulement si les credentials sont configurés
+    if (this.isEmailConfigured()) {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.MAIL_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USERNAME,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      });
+    } else {
+      console.warn('⚠️ [AdminNotifications] SMTP non configuré - Les emails admin ne seront pas envoyés');
+    }
   }
 
   /**
    * Envoyer un email de notification de validation de compte
    */
   async sendAccountValidationEmail(userEmail: string, userName: string) {
+    if (!this.isEmailConfigured() || !this.transporter) {
+      console.warn(`⚠️ [AdminNotifications] SMTP non configuré - Email de validation non envoyé à ${userEmail}`);
+      return;
+    }
+
     try {
       await this.transporter.sendMail({
         from: `"BasketStats Admin" <${process.env.MAIL_FROM_ADDRESS || 'noreply@basketstats.com'}>`,

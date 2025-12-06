@@ -5,23 +5,36 @@ import * as nodemailer from 'nodemailer';
 export class ClubNotificationsService {
   private transporter: nodemailer.Transporter;
 
+  private isEmailConfigured(): boolean {
+    return !!(process.env.MAIL_USERNAME && process.env.MAIL_PASSWORD);
+  }
+
   constructor() {
-    // Configurer le transporteur email
-    this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.MAIL_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
+    // Configurer le transporteur email seulement si les credentials sont configurés
+    if (this.isEmailConfigured()) {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.MAIL_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USERNAME,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      });
+    } else {
+      console.warn('⚠️ [ClubNotifications] SMTP non configuré - Les emails de club ne seront pas envoyés');
+    }
   }
 
   /**
    * Email de confirmation de soumission de club
    */
   async sendClubSubmissionEmail(to: string, recipientName: string, clubName: string) {
+    if (!this.isEmailConfigured() || !this.transporter) {
+      console.warn(`⚠️ [ClubNotifications] SMTP non configuré - Email de soumission de club non envoyé à ${to}`);
+      return;
+    }
+
     const subject = '📝 Demande de création de club soumise';
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
