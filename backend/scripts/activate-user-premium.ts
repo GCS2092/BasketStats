@@ -44,12 +44,31 @@ async function main() {
     // Trouver l'utilisateur par email
     console.log(`🔍 Recherche de l'utilisateur: ${email}...\n`);
     
+    // Utiliser select pour éviter les colonnes qui n'existent pas encore (suspended_at, etc.)
     const user = await prisma.user.findUnique({
       where: { email },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+        verified: true,
+        active: true,
         subscriptions: {
-          include: {
-            plan: true,
+          select: {
+            id: true,
+            status: true,
+            startDate: true,
+            endDate: true,
+            plan: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+                price: true,
+                duration: true,
+              },
+            },
           },
           orderBy: {
             createdAt: 'desc',
