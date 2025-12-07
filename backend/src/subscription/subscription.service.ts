@@ -41,8 +41,34 @@ export class SubscriptionService {
           { endDate: { gt: new Date() } }
         ]
       },
-      include: {
-        plan: true
+      select: {
+        id: true,
+        userId: true,
+        planId: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+        paymentMethod: true,
+        transactionId: true,
+        autoRenew: true,
+        createdAt: true,
+        updatedAt: true,
+        plan: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            description: true,
+            price: true,
+            duration: true,
+            features: true,
+            maxClubs: true,
+            maxPlayers: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
