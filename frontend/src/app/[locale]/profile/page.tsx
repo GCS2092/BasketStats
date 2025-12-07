@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -104,7 +104,7 @@ export default function ProfilePage() {
   const { errors, validateField, validateForm } = useFormValidation(validationRules);
 
   // Initialiser formData avec les données du profil
-  useState(() => {
+  useEffect(() => {
     if (profile && !isEditing) {
       setFormData({
         ...profile,
@@ -112,7 +112,7 @@ export default function ProfilePage() {
         ...recruiterProfile,
       });
     }
-  });
+  }, [profile, playerProfile, recruiterProfile, isEditing]);
 
   // Mutation pour mettre à jour le profil
   const updateProfileMutation = useMutation({
