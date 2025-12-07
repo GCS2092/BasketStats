@@ -45,7 +45,13 @@ apiClient.interceptors.request.use(
       if (!token) {
         try {
           const session = await getSession();
-          token = session?.accessToken || null;
+          // NextAuth stocke le token dans session.accessToken ou session.user.accessToken
+          token = (session as any)?.accessToken || (session as any)?.user?.accessToken || null;
+          
+          // Si le token est dans la session, le sauvegarder dans localStorage pour les prochaines requêtes
+          if (token) {
+            localStorage.setItem('accessToken', token);
+          }
         } catch (error) {
           // En cas d'erreur lors de la récupération de la session (ex: JSON parse error)
           // On continue sans token plutôt que de bloquer la requête
@@ -56,6 +62,14 @@ apiClient.interceptors.request.use(
       
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        // Si pas de token, retirer l'Authorization pour éviter les erreurs
+        delete config.headers.Authorization;
+      }
+      
+      // Pour FormData, ne pas définir Content-Type - Axios le fera automatiquement
+      if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
       }
     }
     return config;

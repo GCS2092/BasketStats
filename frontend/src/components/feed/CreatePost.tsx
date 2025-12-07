@@ -41,17 +41,17 @@ export default function CreatePost() {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Récupérer le token depuis le localStorage ou la session
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const sessionToken = session?.accessToken;
-      const authToken = token || sessionToken;
-
       const endpoint = type === 'image' ? '/upload/image' : '/upload/video';
+      
+      // Pour FormData, NE PAS définir Content-Type manuellement
+      // Axios le définira automatiquement avec le bon boundary
+      // L'intercepteur dans apiClient ajoutera automatiquement l'Authorization
       const response = await apiClient.post(endpoint, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+          // Ne pas définir Content-Type pour FormData - Axios le fait automatiquement
         },
+        // Augmenter le timeout pour les gros fichiers
+        timeout: 60000, // 60 secondes
       });
 
       const newMedia = {
@@ -63,7 +63,28 @@ export default function CreatePost() {
       setMedia((prev) => [...prev, newMedia]);
     } catch (error: any) {
       console.error('Erreur upload:', error);
-      const errorMsg = error.response?.data?.message || 'Erreur lors de l\'upload du fichier';
+      
+      // Messages d'erreur plus détaillés
+      let errorMsg = 'Erreur lors de l\'upload du fichier';
+      
+      if (error.response) {
+        // Erreur du serveur
+        errorMsg = error.response.data?.message || error.response.data?.error || errorMsg;
+        
+        if (error.response.status === 401) {
+          errorMsg = 'Vous devez être connecté pour uploader des fichiers';
+        } else if (error.response.status === 413) {
+          errorMsg = 'Fichier trop volumineux. Taille max: 100MB';
+        } else if (error.response.status === 400) {
+          errorMsg = error.response.data?.message || 'Format de fichier non autorisé';
+        }
+      } else if (error.request) {
+        // Pas de réponse du serveur
+        errorMsg = 'Impossible de contacter le serveur. Vérifiez votre connexion.';
+      } else if (error.code === 'ECONNABORTED') {
+        errorMsg = 'Upload trop long. Le fichier est peut-être trop volumineux.';
+      }
+      
       alert(errorMsg);
     } finally {
       setIsUploading(false);
