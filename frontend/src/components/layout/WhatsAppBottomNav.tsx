@@ -112,12 +112,12 @@ export default function WhatsAppBottomNav() {
       ];
     }
 
-    // Navigation pour ADMIN
+    // Navigation pour ADMIN - Accès complet à toutes les fonctionnalités
     if (user.role === 'ADMIN') {
       return [
         { href: '/admin', label: 'Admin', icon: '🛡️', roles: ['ADMIN'] },
-        { href: '/admin/users', label: 'Utilisateurs', icon: '👥', roles: ['ADMIN'] },
-        { href: '/messages', label: 'Messages', icon: '💬', roles: ['ADMIN'] },
+        { href: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['ADMIN'] },
+        { href: '/admin/posts', label: 'Posts', icon: '📝', roles: ['ADMIN'] },
         { href: '/notifications', label: 'Notifications', icon: '🔔', roles: ['ADMIN'] },
         { href: `/players/${user.id}`, label: 'Profil', icon: '👤', roles: ['ADMIN'] },
       ];

@@ -13,7 +13,7 @@ import { useAuthSync } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 function AdminDashboardContent() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
@@ -38,6 +38,7 @@ function AdminDashboardContent() {
   }
 
   if (status === 'unauthenticated' || session?.user?.role !== 'ADMIN') {
+    router.push('/feed');
     return null;
   }
 

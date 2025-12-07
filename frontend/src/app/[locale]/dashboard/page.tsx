@@ -24,6 +24,7 @@ export default function DashboardPage() {
   useAuthSync();
 
   const isRecruiter = session?.user?.role === 'RECRUITER';
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   const { data: subscriptionCheck, isLoading: subscriptionLoading } = useQuery({
     queryKey: ['subscription-check'],
@@ -41,14 +42,15 @@ export default function DashboardPage() {
       const response = await apiClient.get('/analytics/recruiter/dashboard');
       return response.data;
     },
-    enabled: !!session && isRecruiter && subscriptionCheck?.canAccess,
+    enabled: !!session && (isRecruiter || isAdmin) && (subscriptionCheck?.canAccess || isAdmin),
   });
 
   useEffect(() => {
-    if (subscriptionCheck && !subscriptionCheck.canAccess) {
+    // Les admins ont toujours accès, pas besoin de vérifier l'abonnement
+    if (subscriptionCheck && !subscriptionCheck.canAccess && !isAdmin) {
       router.push('/subscription');
     }
-  }, [subscriptionCheck, router]);
+  }, [subscriptionCheck, router, isAdmin]);
 
   if (subscriptionLoading || isLoading) {
     return (
@@ -61,7 +63,8 @@ export default function DashboardPage() {
     );
   }
 
-  if (!isRecruiter) {
+  // Permettre l'accès aux recruteurs ET aux admins
+  if (!isRecruiter && !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -78,7 +81,8 @@ export default function DashboardPage() {
     );
   }
 
-  if (subscriptionCheck && !subscriptionCheck.canAccess) {
+  // Les admins ont toujours accès, pas besoin de vérifier l'abonnement
+  if (subscriptionCheck && !subscriptionCheck.canAccess && !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -94,7 +98,7 @@ export default function DashboardPage() {
   const recentActivity = dashboardData?.recentActivity || [];
 
   return (
-    <ProtectedRoute requiredRole="RECRUITER" requiresVerification={true} redirectTo="/feed">
+    <ProtectedRoute requiredRole={isAdmin ? "ADMIN" : "RECRUITER"} requiresVerification={!isAdmin} redirectTo="/feed">
       <SubscriptionGuard>
         <div className="min-h-screen bg-neutral-100">
         <Header />
