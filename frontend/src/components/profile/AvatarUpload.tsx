@@ -94,10 +94,12 @@ export default function AvatarUpload({ currentAvatar, userId }: AvatarUploadProp
   const isRecruiter = session?.user?.role === 'RECRUITER';
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative">
-        <div className={`w-32 h-32 rounded-full flex items-center justify-center text-4xl overflow-hidden border-4 ${
-          isRecruiter ? 'border-purple-300 bg-purple-100' : 'border-blue-300 bg-blue-100'
+    <div className="flex flex-col items-center gap-4 mb-6">
+      <div className="relative group">
+        <div className={`w-32 h-32 rounded-full flex items-center justify-center text-4xl overflow-hidden border-4 shadow-xl ${
+          isRecruiter 
+            ? 'border-purple-300 bg-gradient-to-br from-purple-100 to-purple-200' 
+            : 'border-blue-300 bg-gradient-to-br from-blue-100 to-blue-200'
         }`}>
           {preview ? (
             <NetworkAwareImage
@@ -113,8 +115,25 @@ export default function AvatarUpload({ currentAvatar, userId }: AvatarUploadProp
           )}
         </div>
         
+        {/* Bouton caméra moderne */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className={`absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-200 hover:scale-110 ${
+            isRecruiter
+              ? 'bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+              : 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+          }`}
+        >
+          {isUploading ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+          ) : (
+            <span className="text-lg">📷</span>
+          )}
+        </button>
+        
         {isUploading && (
-          <div className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-black bg-opacity-30 flex items-center justify-center backdrop-blur-sm">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
           </div>
         )}
@@ -128,18 +147,7 @@ export default function AvatarUpload({ currentAvatar, userId }: AvatarUploadProp
         />
       </div>
 
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isUploading}
-        className={`btn text-sm font-semibold ${
-          isRecruiter
-            ? 'bg-purple-500 hover:bg-purple-600 text-white'
-            : 'bg-blue-500 hover:bg-blue-600 text-white'
-        }`}
-      >
-        {isUploading ? '⏳ Upload...' : '📷 Changer la photo'}
-      </button>
-      <p className="text-xs text-neutral-500">JPG, PNG ou WebP - Max 5MB</p>
+      <p className="text-xs text-neutral-500 text-center">JPG, PNG ou WebP - Max 5MB</p>
     </div>
   );
 }

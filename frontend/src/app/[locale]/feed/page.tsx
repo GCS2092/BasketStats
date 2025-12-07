@@ -59,16 +59,16 @@ export default function FeedPage() {
       
       <main className="container-custom py-6">
         <div className="max-w-2xl mx-auto space-y-6">
-          {/* Bannière de bienvenue selon le rôle */}
-          <div className={`card p-6 border-l-4 ${
+          {/* Bannière de bienvenue moderne selon le rôle */}
+          <div className={`card-modern p-6 mb-6 ${
             isRecruiter 
-              ? 'border-l-purple-500 bg-purple-50' 
-              : 'border-l-blue-500 bg-blue-50'
+              ? 'bg-gradient-to-r from-purple-50 to-purple-100 border-l-4 border-purple-500' 
+              : 'bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500'
           }`}>
-            <h2 className="text-2xl font-bold mb-2">
+            <h2 className="text-2xl font-bold mb-2 text-neutral-800">
               {isRecruiter ? '🔍 ' + t('feed.recruiterTitle') : '🏀 ' + t('feed.title')}
             </h2>
-            <p className="text-neutral-700">
+            <p className="text-neutral-700 text-base">
               {isRecruiter 
                 ? t('feed.recruiterWelcome', { name: session?.user?.name || '' })
                 : t('feed.welcome', { name: session?.user?.name || '' })
@@ -89,9 +89,10 @@ export default function FeedPage() {
               )
             ))
           ) : (
-            <div className="card p-12 text-center">
-              <p className="text-neutral-500 text-lg">{t('feed.noContent')}</p>
-              <p className="text-neutral-400 mt-2">{t('feed.beFirst')}</p>
+            <div className="card-modern p-12 text-center">
+              <div className="text-6xl mb-4">📰</div>
+              <p className="text-neutral-600 text-lg font-medium">{t('feed.noContent')}</p>
+              <p className="text-neutral-400 mt-2 text-sm">{t('feed.beFirst')}</p>
             </div>
           )}
         </div>

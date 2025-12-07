@@ -123,32 +123,30 @@ export default function CreatePost() {
   };
 
   return (
-    <div className={`card p-6 border-l-4 ${
-      isRecruiter ? 'border-l-purple-500' : 'border-l-blue-500'
-    }`}>
+    <div className="card-modern p-5 mb-6">
       <div className="flex items-start gap-4">
-        {/* Avatar avec badge de rôle */}
+        {/* Avatar moderne avec badge de rôle */}
         <div className="relative flex-shrink-0">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
+          <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 shadow-md ${
             isRecruiter 
-              ? 'bg-purple-100 border-purple-300' 
-              : 'bg-blue-100 border-blue-300'
+              ? 'bg-gradient-to-br from-purple-400 to-purple-600 border-purple-300' 
+              : 'bg-gradient-to-br from-blue-400 to-blue-600 border-blue-300'
           }`}>
             {session?.user?.image ? (
               <SimpleImage
                 src={session.user.image}
                 alt=""
-                width={48}
-                height={48}
+                width={56}
+                height={56}
                 className="w-full h-full rounded-full object-cover"
                 fill={false}
               />
             ) : (
-              <span className="text-xl">{isRecruiter ? '🔍' : '🏀'}</span>
+              <span className="text-2xl">{isRecruiter ? '🔍' : '🏀'}</span>
             )}
           </div>
-          <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs ${
-            isRecruiter ? 'bg-purple-500' : 'bg-blue-500'
+          <div className={`absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-lg ${
+            isRecruiter ? 'bg-purple-600' : 'bg-blue-600'
           }`}>
             {isRecruiter ? '🔍' : '🏀'}
           </div>
@@ -160,10 +158,10 @@ export default function CreatePost() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={placeholder}
-            className={`w-full resize-none border-2 rounded-lg p-3 focus:outline-none focus:ring-2 focus:border-transparent ${
+            className={`w-full resize-none border-2 rounded-xl p-4 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
               isRecruiter
-                ? 'border-purple-300 focus:ring-purple-500'
-                : 'border-blue-300 focus:ring-blue-500'
+                ? 'border-purple-200 focus:ring-purple-500 focus:border-purple-400'
+                : 'border-blue-200 focus:ring-blue-500 focus:border-blue-400'
             }`}
             rows={3}
           />
@@ -212,9 +210,10 @@ export default function CreatePost() {
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isUploading}
-                className="px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 flex items-center gap-2"
               >
-                📷 Photo
+                <span className="text-lg">📷</span>
+                <span>Photo</span>
               </button>
 
               <input
@@ -228,9 +227,10 @@ export default function CreatePost() {
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isUploading}
-                className="px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 flex items-center gap-2"
               >
-                🎥 Vidéo
+                <span className="text-lg">🎥</span>
+                <span>Vidéo</span>
               </button>
 
               {isUploading && (
@@ -241,10 +241,10 @@ export default function CreatePost() {
             <button
               type="submit"
               disabled={(!content.trim() && media.length === 0) || isPosting || isUploading}
-              className={`btn font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`px-6 py-2.5 rounded-xl font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
                 isRecruiter
-                  ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+                  : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
               }`}
             >
               {isPosting ? 'Publication...' : isRecruiter ? '📢 Publier l\'annonce' : '✨ Publier'}

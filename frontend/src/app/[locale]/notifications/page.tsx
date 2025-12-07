@@ -81,6 +81,37 @@ export default function NotificationsPage() {
 
   const unreadCount = notifications?.notifications?.filter((n: any) => !n.read).length || 0;
 
+  // Grouper les notifications par date
+  const groupedNotifications = useMemo(() => {
+    const list = notifications?.notifications || [];
+    const filtered = filter === 'unread' ? list.filter((n: any) => !n.read) : list;
+    
+    // Grouper par date
+    const groups: { [key: string]: any[] } = {};
+    filtered.forEach((notif: any) => {
+      const notifDate = new Date(notif.createdAt);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      let dateKey = '';
+      if (notifDate.toDateString() === today.toDateString()) {
+        dateKey = 'Aujourd\'hui';
+      } else if (notifDate.toDateString() === yesterday.toDateString()) {
+        dateKey = 'Hier';
+      } else {
+        dateKey = notifDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      }
+      
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(notif);
+    });
+    
+    return groups;
+  }, [notifications?.notifications, filter]);
+
   const filteredNotifications = useMemo(() => {
     const list = notifications?.notifications || [];
     if (filter === 'unread') return list.filter((n: any) => !n.read);
@@ -143,16 +174,20 @@ export default function NotificationsPage() {
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
-          ) : filteredNotifications.length > 0 ? (
-            <div className="space-y-3">
-              {filteredNotifications.map((notif: any) => (
-                <div
-                  key={notif.id}
-                  className={`card p-4 cursor-pointer hover:shadow-md transition-all ${
-                    !notif.read ? 'border-l-4 border-l-primary bg-primary-50' : ''
-                  }`}
-                  onClick={() => !notif.read && markAsReadMutation.mutate(notif.id)}
-                >
+          ) : Object.keys(groupedNotifications).length > 0 ? (
+            <div className="space-y-6">
+              {Object.entries(groupedNotifications).map(([dateLabel, notifs]) => (
+                <div key={dateLabel}>
+                  <h3 className="text-sm font-semibold text-neutral-500 mb-3 px-2">{dateLabel}</h3>
+                  <div className="space-y-3">
+                    {notifs.map((notif: any) => (
+                      <div
+                        key={notif.id}
+                        className={`card-modern p-5 cursor-pointer hover:shadow-lg transition-all duration-200 ${
+                          !notif.read ? 'border-l-4 border-l-primary bg-gradient-to-r from-primary-50 to-white' : ''
+                        }`}
+                        onClick={() => !notif.read && markAsReadMutation.mutate(notif.id)}
+                      >
                   <div className="flex items-start gap-3">
                     {/* Icône selon le type */}
                     <div className="text-3xl flex-shrink-0">
@@ -250,10 +285,13 @@ export default function NotificationsPage() {
                       </button>
                     </div>
 
-                    {/* Indicateur non lu */}
-                    {!notif.read && (
-                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></div>
-                    )}
+                        {/* Indicateur non lu */}
+                        {!notif.read && (
+                          <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></div>
+                        )}
+                      </div>
+                    </div>
+                    ))}
                   </div>
                 </div>
               ))}

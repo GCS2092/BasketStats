@@ -79,14 +79,14 @@ export default function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <div className="card p-6">
+    <div className="card-modern p-5 mb-4">
       <div className="flex items-start gap-4">
         <Link href={`/players/${post.user.id}`}>
-          <div className="w-12 h-12 rounded-full bg-neutral-200 flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-90 transition-all duration-200 hover:scale-105 shadow-md border-2 border-white">
             {post.user.avatarUrl ? (
               <img src={post.user.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
             ) : (
-              '👤'
+              <span className="text-2xl">👤</span>
             )}
           </div>
         </Link>
@@ -99,13 +99,13 @@ export default function PostCard({ post }: PostCardProps) {
               </Link>
             </div>
             
-            {/* Badge de rôle */}
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${
+            {/* Badge de rôle moderne */}
+            <span className={`badge-modern ${
               post.user.role === 'RECRUITER'
-                ? 'bg-purple-100 text-purple-700 border-purple-300'
+                ? 'bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 border border-purple-200'
                 : post.user.role === 'ADMIN'
-                ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
-                : 'bg-blue-100 text-blue-700 border-blue-300'
+                ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-700 border border-yellow-200'
+                : 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 border border-blue-200'
             }`}>
               <span>{post.user.role === 'RECRUITER' ? '🔍' : post.user.role === 'ADMIN' ? '👑' : '🏀'}</span>
               <span>{post.user.role === 'RECRUITER' ? 'Recruteur' : post.user.role === 'ADMIN' ? 'Admin' : 'Joueur'}</span>
@@ -147,28 +147,28 @@ export default function PostCard({ post }: PostCardProps) {
             </div>
           )}
 
-          {/* Boutons d'interaction */}
-          <div className="flex items-center gap-6 text-neutral-600 border-t pt-4">
+          {/* Boutons d'interaction modernes */}
+          <div className="flex items-center gap-4 text-neutral-600 border-t border-neutral-100 pt-4 mt-4">
             <button
               onClick={handleLike}
               disabled={likeMutation.isPending}
-              className={`flex items-center gap-2 transition-colors ${
-                isLiked ? 'text-red-500' : 'hover:text-red-500'
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 hover:bg-red-50 ${
+                isLiked ? 'text-red-500 bg-red-50' : 'hover:text-red-500'
               }`}
             >
               <span className="text-xl">{isLiked ? '❤️' : '🤍'}</span>
-              <span className="font-medium">{likesCount}</span>
+              <span className="font-semibold">{likesCount}</span>
             </button>
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 hover:text-primary transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all duration-200"
             >
               <span className="text-xl">💬</span>
-              <span className="font-medium">{post.commentsCount}</span>
+              <span className="font-semibold">{post.commentsCount}</span>
             </button>
-            <button className="flex items-center gap-2 hover:text-primary transition-colors">
+            <button className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-neutral-100 hover:text-primary transition-all duration-200">
               <span className="text-xl">🔗</span>
-              <span className="font-medium">Partager</span>
+              <span className="font-semibold">Partager</span>
             </button>
           </div>
 

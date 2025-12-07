@@ -75,9 +75,13 @@
     @apply btn text-neutral-700 hover:bg-neutral-200 focus:ring-neutral-400 active:bg-neutral-300;
   }
 
-  /* Cards responsives */
+  /* Cards responsives - Design moderne */
   .card {
-    @apply bg-white rounded-lg shadow-md overflow-hidden;
+    @apply bg-white rounded-xl shadow-sm border border-neutral-100 overflow-hidden transition-all duration-300 hover:shadow-md;
+  }
+
+  .card-modern {
+    @apply bg-white rounded-2xl shadow-lg border-0 overflow-hidden transition-all duration-300 hover:shadow-xl;
   }
 
   .card-compact {
@@ -163,6 +167,33 @@
 
   .scrollbar-thin::-webkit-scrollbar-track {
     background-color: transparent;
+  }
+
+  /* Design moderne - Glassmorphism et effets */
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .gradient-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-modern-blue {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-modern-purple {
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  }
+
+  /* Avatar moderne */
+  .avatar-modern {
+    @apply rounded-full border-2 border-white shadow-lg;
+  }
+
+  /* Badge moderne */
+  .badge-modern {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold shadow-sm;
   }
 
   /* Hide scrollbar mais gardant la fonctionnalité */

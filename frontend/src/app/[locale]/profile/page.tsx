@@ -156,22 +156,36 @@ export default function ProfilePage() {
       
       <main className="container-custom py-6">
         <div className="max-w-4xl mx-auto">
-          <div className="card p-6 mb-6">
-            <h1 className="text-3xl font-bold mb-4">{t('profile.title')}</h1>
+          <div className="card-modern p-6 mb-6">
+            <h1 className="text-3xl font-bold mb-6 text-neutral-800">{t('profile.title')}</h1>
             
-            {/* Tabs */}
-            <div className="flex gap-2 mb-6 border-b">
+            {/* Tabs modernes */}
+            <div className="flex gap-2 mb-6 border-b border-neutral-200">
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`px-4 py-2 font-medium ${activeTab === 'profile' ? 'border-b-2 border-primary text-primary' : 'text-neutral-600'}`}
+                className={`px-6 py-3 font-semibold text-sm transition-all duration-200 relative ${
+                  activeTab === 'profile' 
+                    ? 'text-primary' 
+                    : 'text-neutral-600 hover:text-neutral-800'
+                }`}
               >
                 {t('profile.profile')}
+                {activeTab === 'profile' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-600 rounded-t-full" />
+                )}
               </button>
               <button
                 onClick={() => setActiveTab('subscription')}
-                className={`px-4 py-2 font-medium ${activeTab === 'subscription' ? 'border-b-2 border-primary text-primary' : 'text-neutral-600'}`}
+                className={`px-6 py-3 font-semibold text-sm transition-all duration-200 relative ${
+                  activeTab === 'subscription' 
+                    ? 'text-primary' 
+                    : 'text-neutral-600 hover:text-neutral-800'
+                }`}
               >
                 {t('profile.subscription')}
+                {activeTab === 'subscription' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary-600 rounded-t-full" />
+                )}
               </button>
             </div>
 
@@ -211,10 +225,16 @@ export default function ProfilePage() {
                     )}
 
                     <div className="flex gap-4">
-                      <button onClick={handleSave} className="btn-primary">
+                      <button 
+                        onClick={handleSave} 
+                        className="px-6 py-3 bg-gradient-to-r from-primary to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                      >
                         {t('common.save')}
                       </button>
-                      <button onClick={() => setIsEditing(false)} className="btn-secondary">
+                      <button 
+                        onClick={() => setIsEditing(false)} 
+                        className="px-6 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-200 transition-all duration-200"
+                      >
                         {t('common.cancel')}
                       </button>
                     </div>
@@ -228,7 +248,10 @@ export default function ProfilePage() {
                         <p><strong>Poids:</strong> {playerProfile.weightKg} kg</p>
                       </>
                     )}
-                    <button onClick={() => setIsEditing(true)} className="btn-primary mt-4">
+                    <button 
+                      onClick={() => setIsEditing(true)} 
+                      className="px-6 py-3 bg-gradient-to-r from-primary to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 mt-4"
+                    >
                       {t('profile.edit')}
                     </button>
                   </div>
