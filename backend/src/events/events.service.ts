@@ -133,52 +133,109 @@ export class EventsService {
    * Inscription à un événement
    */
   async register(eventId: string, userId: string) {
-    const event = await this.prisma.event.findUnique({
-      where: { id: eventId },
-    });
-
-    if (!event) {
-      throw new NotFoundException('Événement non trouvé');
-    }
-
-    // Vérifier si déjà inscrit
-    if (event.participants.includes(userId)) {
-      throw new BadRequestException('Déjà inscrit à cet événement');
-    }
-
-    // Vérifier le nombre max de participants
-    if (event.maxParticipants && event.participants.length >= event.maxParticipants) {
-      throw new BadRequestException('Événement complet');
-    }
-
-    return this.prisma.event.update({
-      where: { id: eventId },
-      data: {
-        participants: {
-          push: userId,
+    try {
+      const event = await this.prisma.event.findUnique({
+        where: { id: eventId },
+        select: {
+          id: true,
+          participants: true,
+          maxParticipants: true,
         },
-      },
-    });
+      });
+
+      if (!event) {
+        throw new NotFoundException('Événement non trouvé');
+      }
+
+      // Initialiser participants si null ou undefined
+      const currentParticipants = event.participants || [];
+
+      // Vérifier si déjà inscrit
+      if (currentParticipants.includes(userId)) {
+        throw new BadRequestException('Déjà inscrit à cet événement');
+      }
+
+      // Vérifier le nombre max de participants
+      if (event.maxParticipants && currentParticipants.length >= event.maxParticipants) {
+        throw new BadRequestException('Événement complet');
+      }
+
+      return await this.prisma.event.update({
+        where: { id: eventId },
+        data: {
+          participants: {
+            push: userId,
+          },
+        },
+        include: {
+          club: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              city: true,
+              country: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      // Re-lancer les erreurs NotFoundException et BadRequestException
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      // Logger les autres erreurs et les transformer en erreur générique
+      console.error('Erreur lors de l\'inscription à l\'événement:', error);
+      throw new BadRequestException('Erreur lors de l\'inscription à l\'événement');
+    }
   }
 
   /**
    * Désinscription d'un événement
    */
   async unregister(eventId: string, userId: string) {
-    const event = await this.prisma.event.findUnique({
-      where: { id: eventId },
-    });
+    try {
+      const event = await this.prisma.event.findUnique({
+        where: { id: eventId },
+        select: {
+          id: true,
+          participants: true,
+        },
+      });
 
-    if (!event) {
-      throw new NotFoundException('Événement non trouvé');
+      if (!event) {
+        throw new NotFoundException('Événement non trouvé');
+      }
+
+      // Initialiser participants si null ou undefined
+      const currentParticipants = event.participants || [];
+
+      return await this.prisma.event.update({
+        where: { id: eventId },
+        data: {
+          participants: currentParticipants.filter((id) => id !== userId),
+        },
+        include: {
+          club: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              city: true,
+              country: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      // Re-lancer les erreurs NotFoundException
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      // Logger les autres erreurs et les transformer en erreur générique
+      console.error('Erreur lors de la désinscription de l\'événement:', error);
+      throw new BadRequestException('Erreur lors de la désinscription de l\'événement');
     }
-
-    return this.prisma.event.update({
-      where: { id: eventId },
-      data: {
-        participants: event.participants.filter((id) => id !== userId),
-      },
-    });
   }
 
   /**

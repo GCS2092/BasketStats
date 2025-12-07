@@ -58,9 +58,23 @@ export class EventsController {
     return this.eventsService.register(eventId, userId);
   }
 
+  @Post(':id/participate')
+  @UseGuards(JwtAuthGuard)
+  participate(@Param('id') eventId: string, @GetUser('id') userId: string) {
+    // Alias de register pour compatibilité avec les apps Flutter
+    return this.eventsService.register(eventId, userId);
+  }
+
   @Delete(':id/register')
   @UseGuards(JwtAuthGuard)
   unregister(@Param('id') eventId: string, @GetUser('id') userId: string) {
+    return this.eventsService.unregister(eventId, userId);
+  }
+
+  @Delete(':id/participate')
+  @UseGuards(JwtAuthGuard)
+  unparticipate(@Param('id') eventId: string, @GetUser('id') userId: string) {
+    // Alias de unregister pour compatibilité avec les apps Flutter
     return this.eventsService.unregister(eventId, userId);
   }
 }
